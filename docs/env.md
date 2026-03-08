@@ -104,6 +104,41 @@ REDIS_URL=redis://localhost:6379
 - `GOOGLE_OAUTH_JWKS_REQUEST_TIMEOUT_MS`
 - `GOOGLE_OAUTH_JWKS_COOLDOWN_SECONDS`
 
+## Env estendido no consumidor
+
+Quando o consumidor precisar adicionar variáveis próprias, o padrão recomendado é:
+
+1. declarar `AppEnv extends Env`;
+2. criar um `parseAppEnv(...)` local que faz `...parseEnv(input)` e adiciona os campos do consumidor;
+3. subir o app com `createApp<AppEnv>({ env })`;
+4. criar um wrapper único de rota com `createDefineZodRoute<AppEnv>()`.
+
+Exemplo:
+
+```ts
+import { createApp, createDefineZodRoute, parseEnv } from '@sebrae/api-base';
+import type { Env } from '@sebrae/api-base';
+
+interface AppEnv extends Env {
+  APP_BASE_URL: string;
+}
+
+const parseAppEnv = (input: Record<string, unknown>): AppEnv => ({
+  ...parseEnv(input),
+  APP_BASE_URL:
+    typeof input.APP_BASE_URL === 'string' ? input.APP_BASE_URL : 'http://127.0.0.1:3000',
+});
+
+const env = parseAppEnv(process.env);
+export const defineAppRoute = createDefineZodRoute<AppEnv>();
+const app = createApp<AppEnv>({ env });
+```
+
+Limite atual intencional:
+
+- o TypeScript nao consegue inferir sozinho o `TEnv` do `createApp(...)` dentro de modulos de rota isolados;
+- por isso a forma mais ergonomica e criar o wrapper `defineAppRoute` uma unica vez no consumidor.
+
 ## Observabilidade
 
 - `OTEL_ENABLED`

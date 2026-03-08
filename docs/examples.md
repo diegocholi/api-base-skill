@@ -10,6 +10,7 @@ Observação sobre imports:
 ## Bootstrap e rotas
 
 - `server-example.ts`: sobe a API com `createApp` e resolve `src/http/routes` no dev e `dist/http/routes` no build.
+- `typed-consumer-env-example.ts`: mostra como estender `Env` no consumidor sem casts por rota.
 - `register-route-example.ts`: rota HTTP com `defineZodRoute`, `querystring` e resposta tipada.
 - `auth-protected-route-example.ts`: rota protegida pelo guard global, com `security` e provider explícito.
 - `auth-public-route-example.ts`: rota pública com `config.auth.public = true`.
@@ -22,6 +23,18 @@ import { createApp, env } from '@sebrae/api-base';
 
 const app = createApp({ env, routesDir: resolveRoutesDir() });
 await app.listen({ port: env.PORT, host: '0.0.0.0' });
+```
+
+Quando o consumidor tiver env estendido, o padrão recomendado passa a ser:
+
+```ts
+interface AppEnv extends Env {
+  APP_BASE_URL: string;
+}
+
+const env = parseAppEnv(process.env);
+const defineAppRoute = createDefineZodRoute<AppEnv>();
+const app = createApp<AppEnv>({ env });
 ```
 
 ## Validação e fluxo de aplicação

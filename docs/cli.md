@@ -57,8 +57,8 @@ Arquivos e diretórios centrais gerados:
 - `src/config/env.ts`
 - `src/http/routes`
 - `src/http/zod.ts`
-- `src/http/fastify.d.ts`
 - `src/http/fastify-context.d.ts`
+- `src/http/types.ts`
 - `src/http/route.types.ts`
 - `src/infra/db/repo-base.ts`
 - `src/shared/errors.ts`
@@ -79,6 +79,16 @@ Além da estrutura, o `init` também:
 - prepara o build para usar `api-cli routes:prepare-build`, que poda `__routes`
   e gera `routes.manifest.json` para reduzir custo de cold start;
 - tenta instalar dependências automaticamente, salvo quando usado `--no-install`.
+
+No padrão atual, o scaffold já assume que o consumidor pode ter envs próprias:
+
+- `src/config/env.ts` declara `AppEnv extends Env`;
+- `src/server.ts` usa `createApp<AppEnv>({ env, routesDir })`;
+- `src/http/zod.ts` cria um wrapper local com `createDefineZodRoute<AppEnv>()`;
+- `src/http/types.ts` expõe aliases locais como `App`, `AppFastifyInstance` e `AppFastifyRequest`.
+
+Isso reduz a necessidade de casts ou adapters por rota quando o projeto adiciona
+variáveis próprias além das fornecidas pela `API-BASE`.
 
 Alguns wrappers gerados são "pass-through" para exports públicos da lib, como:
 
@@ -254,6 +264,8 @@ Comportamentos úteis:
 
 Migrações atuais:
 
+- `consumer-scaffold-v3`: atualiza wrappers e entrypoints gerados pelo scaffold
+  para o padrão atual da `API-BASE`;
 - `consumer-scripts-v2`: atualiza scripts do `package.json` para o padrão atual;
 - `legacy-generated-scripts-v2`: remove scripts legados gerados por versões mais
   antigas do scaffold.

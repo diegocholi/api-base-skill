@@ -14,9 +14,16 @@ Bootstrap:
 Rotas e validação:
 
 - `defineZodRoute`
+- `createDefineZodRoute`
 - `withZod`
 - `parseWithZod`
 - `parseBody`, `parseQuery`, `parseParams` apenas por compatibilidade
+
+Bootstrap tipado:
+
+- `createApp<TEnv>()`
+- tipo `ApiBaseFastifyInstance<TEnv>`
+- tipo `ApiBaseFastifyRequest<TRouteGeneric, TEnv>`
 
 Erros e resultado:
 

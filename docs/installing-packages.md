@@ -64,6 +64,9 @@ Para consumidores antigos:
 pnpm api-cli migrate
 ```
 
+O comando aplica todas as migrações conhecidas do scaffold do consumidor,
+incluindo upgrades entre versões antigas e o padrão atual do framework.
+
 Simulação sem escrita:
 
 ```bash
