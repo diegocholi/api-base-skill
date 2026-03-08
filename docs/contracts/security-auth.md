@@ -412,6 +412,39 @@ export default defineZodRoute({
 - Rotas públicas sem config explícita.
 - Token via cookie sem header CSRF quando `JWT_COOKIE_CSFR_HEADER` estiver configurado.
 
+## Emissão de cookies de auth
+
+Quando o consumidor optar por `JWT_TOKEN_SOURCES=cookie`, a `api-base` também expõe helpers para
+emitir e limpar os cookies no `reply`.
+
+Exemplo:
+
+```ts
+reply.issueAuthCookies({
+  token: accessToken,
+  ttlSeconds: 3600,
+});
+
+reply.clearAuthCookies();
+```
+
+Configuração relacionada:
+
+- `JWT_COOKIE_NAME`
+- `JWT_COOKIE_DOMAIN`
+- `JWT_COOKIE_PATH`
+- `JWT_COOKIE_SAME_SITE`
+- `JWT_COOKIE_SECURE`
+- `JWT_COOKIE_CSFR_HEADER`
+- `JWT_COOKIE_CSFR_COOKIE_NAME`
+
+Comportamento:
+
+- o cookie de auth sai com `HttpOnly`;
+- o cookie CSRF sai legível no browser para o padrão double-submit;
+- `JWT_COOKIE_SAME_SITE=none` exige `JWT_COOKIE_SECURE=true`;
+- os helpers preservam outros headers `Set-Cookie` já existentes na resposta.
+
 ## Checklist de revisão
 
 - [ ] `JWT_ALLOWED_ALGS` configurado.
