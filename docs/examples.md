@@ -13,6 +13,7 @@ Observação sobre imports:
 - `register-route-example.ts`: rota HTTP com `defineZodRoute`, `querystring` e resposta tipada.
 - `auth-protected-route-example.ts`: rota protegida pelo guard global, com `security` e provider explícito.
 - `auth-public-route-example.ts`: rota pública com `config.auth.public = true`.
+- `social-auth-google-example.ts`: valida `id_token` do Google e retorna identidade normalizada.
 
 Trecho principal:
 

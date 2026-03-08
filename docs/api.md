@@ -30,6 +30,7 @@ Dados e utilitários:
 
 - `RepoBase`
 - `sql`
+- `createGoogleIdTokenVerifier`
 - `createId`
 - `generateClientId`
 - TTLs `CACHE_TTL_*`
@@ -110,6 +111,8 @@ Auth:
 - `JWT_JWKS_URL`
 - `JWT_ISSUER`
 - `JWT_AUDIENCE`
+- `GOOGLE_OAUTH_CLIENT_ID`
+- `GOOGLE_OAUTH_JWKS_URL`
 
 Observabilidade:
 

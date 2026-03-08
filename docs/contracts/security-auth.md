@@ -40,6 +40,56 @@ app.register(authGuardPlugin, { env });
 - `app.requirePolicy(predicate, { name? })`
 - `app.ownerOnly(paramPath)`
 - `app.roleOrOwner(role, paramPath)`
+- `app.verifySocialIdToken({ provider, idToken, nonce? })`
+
+### Social auth
+
+- O runtime registra `verifySocialIdToken` automaticamente no `createApp`.
+- A API-BASE valida apenas o `id_token` e devolve uma identidade externa normalizada.
+- Vínculo local de usuário, autocadastro, papel padrão e emissão do JWT interno continuam sendo responsabilidade do consumidor.
+- Provider nativo nesta versão: `google`.
+- O plugin aceita providers customizados registrados pelo consumidor, mantendo o mesmo contrato `verifySocialIdToken`.
+- Variáveis usadas:
+  - `GOOGLE_OAUTH_CLIENT_ID`
+  - `GOOGLE_OAUTH_JWKS_URL`
+  - `GOOGLE_OAUTH_ISSUERS`
+  - `GOOGLE_OAUTH_CLOCK_TOLERANCE_SECONDS`
+  - `GOOGLE_OAUTH_JWKS_CACHE_TTL_SECONDS`
+  - `GOOGLE_OAUTH_JWKS_REQUEST_TIMEOUT_MS`
+  - `GOOGLE_OAUTH_JWKS_COOLDOWN_SECONDS`
+
+Exemplo:
+
+```ts
+const verifySocialIdToken = request.server.verifySocialIdToken;
+if (!verifySocialIdToken) {
+  reply.code(503);
+  throw new Error('Social auth not configured');
+}
+
+const identity = await verifySocialIdToken({
+  provider: 'google',
+  idToken: request.body.idToken,
+  nonce: request.body.nonce,
+});
+```
+
+Exemplo registrando provider extra:
+
+```ts
+import { registerSocialAuthPlugin, type SocialIdTokenVerifier } from '@sebrae/api-base';
+
+const githubVerifier: SocialIdTokenVerifier = async ({ idToken }) => ({
+  provider: 'github',
+  providerUserId: idToken,
+  emailVerified: true,
+  claims: {},
+});
+
+await registerSocialAuthPlugin(app, env, {
+  providers: { github: githubVerifier },
+});
+```
 
 ### Rotas públicas
 
