@@ -119,7 +119,7 @@ Regra adicional para code agents:
 - para RBAC estatico, prefira `examples/auth-protected-route-example.ts` combinado com `config.roles` e `config.permissions` descritos em [Autenticacao e guards](./contracts/security-auth.md);
 - use `preHandler` manual apenas quando a regra depender de ownership, policy customizada ou auth sem guard global;
 - se um exemplo e o contrato divergirem, siga o contrato e ajuste o exemplo do consumidor conforme necessario.
-- os exemplos desta pasta devem permanecer alinhados com os contratos; se voce atualizar um contrato canonico, atualize o exemplo correspondente no mesmo fluxo.
+- os exemplos desta pasta devem permanecer alinhados com os contratos; se voce atualizar um contrato canonico, atualize o exemplo correspondente no mesmo fluxo seguindo [Manutenção da skill](./maintaining-this-skill.md).
 
 Observação sobre multipart:
 
@@ -136,6 +136,7 @@ Politica de consistencia:
 - contratos canonicos definem o comportamento recomendado;
 - exemplos devem ilustrar esse comportamento sem depender de inferencia adicional;
 - quando um exemplo precisar mostrar uma excecao ao padrao, isso deve estar explicito no proprio doc e no codigo do exemplo.
+- a checklist operacional e os checks locais desta skill ficam em [Manutenção da skill](./maintaining-this-skill.md).
 
 ## Referências relacionadas
 

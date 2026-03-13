@@ -48,11 +48,14 @@ Overrides:
 
 ## Validação da documentação
 
-- `pnpm run docs:links`
-- `pnpm run docs:examples:typecheck`
+- `npm run docs:links`
+- `npm run docs:examples:typecheck`
+- `npm run docs:skill:check`
+- `npm run docs:check`
 
 Esses comandos fazem sentido apenas quando o projeto realmente mantem a suite de docs.
 Nao assuma que eles existem em todo consumidor gerado pela CLI.
+Nesta skill, eles sao mantidos localmente e descritos em [Manutenção da skill](./maintaining-this-skill.md).
 
 ## Minimo de validacao para code agents
 

@@ -37,6 +37,7 @@ A api-base e baseada em:
 - Ao gerar codigo, siga os padroes descritos em `docs/api.md`, `docs/contracts/README.md` e `docs/examples.md`.
 - Ao alterar codigo existente, mantenha compatibilidade com a versao atual do framework usada no consumidor.
 - Ao criar novos modulos, valide naming, registro no container e hooks de lifecycle.
+- Ao alterar esta propria skill, siga `docs/maintaining-this-skill.md` e rode os checks locais antes de concluir.
 
 # Workflow para code agents
 

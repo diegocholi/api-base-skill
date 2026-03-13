@@ -1,0 +1,13 @@
+{
+  "name": "api-base-skill",
+  "private": true,
+  "scripts": {
+    "docs:links": "node scripts/check-links.mjs",
+    "docs:examples:typecheck": "npx tsc -p examples/tsconfig.json --noEmit",
+    "docs:skill:check": "node scripts/check-skill.mjs",
+    "docs:check": "npm run docs:links && npm run docs:examples:typecheck && npm run docs:skill:check"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
