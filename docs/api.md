@@ -25,6 +25,7 @@ Rotas e validação:
 - `withZod`
 - `parseWithZod`
 - `parseBody`, `parseQuery`, `parseParams` apenas por compatibilidade
+- `config.roles`, `config.permissions` e `config.ownership` na definição da rota
 
 Bootstrap tipado:
 

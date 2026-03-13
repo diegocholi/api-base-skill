@@ -81,7 +81,8 @@ Prefira edicao manual quando:
 Para auth e autorizacao contextual:
 
 - prefira `config.roles` e `config.permissions` quando a regra for estatica por rota;
-- use `requirePolicy(...)` quando a regra depender de ownership ou escopo dinamico;
+- prefira `config.ownership` quando a regra for "owner com bypass por role e/ou permissao" e couber no contrato declarativo da rota;
+- use `requirePolicy(...)` apenas quando a regra depender de ownership ou escopo dinamico mais rico do que `config.ownership` suporta;
 - prefira os helpers publicos `createOwnerOnlyPolicy`, `createRoleOrOwnerPolicy` e `createScopeOrOwnerPolicy` em vez de duplicar checks imperativos no handler.
 
 ## 4. Validar depois da mudanca

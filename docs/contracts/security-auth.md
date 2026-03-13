@@ -9,7 +9,7 @@ Este documento deve ser tratado por code agents como a referencia canonica para:
 - bootstrap de auth;
 - protecao de rotas;
 - escolha entre guard global e `preHandler`;
-- uso de `config.roles` e `config.permissions`;
+- uso de `config.roles`, `config.permissions` e `config.ownership`;
 - social auth e cookies.
 
 ## Regra rapida para code agents
@@ -19,25 +19,28 @@ Ao editar ou gerar codigo no consumidor, siga esta ordem:
 1. Registre os plugins necessarios no bootstrap.
 2. Se a rota for publica, declare `config.auth.public = true`.
 3. Se a rota for privada e a regra for estatica, prefira `config.roles` e `config.permissions`.
-4. Use `preHandler` manual apenas quando a regra depender de decorators especificos como `requirePolicy`, `ownerOnly` ou `roleOrOwner`.
-5. Se `AUTH_GUARD_ENABLED=false`, toda rota privada sem `config.roles`/`config.permissions` precisa chamar `request.server.requireAuth` manualmente.
-6. Nunca implemente auth ad-hoc dentro do handler.
+4. Se a rota for privada e a regra for ownership simples, prefira `config.ownership`.
+5. Use `preHandler` manual apenas quando a regra depender de decorators especificos como `requirePolicy`, `ownerOnly` ou `roleOrOwner`, ou quando `config.ownership` nao for suficiente.
+6. Se `AUTH_GUARD_ENABLED=false`, toda rota privada sem `config.roles`/`config.permissions`/`config.ownership` precisa chamar `request.server.requireAuth` manualmente.
+7. Nunca implemente auth ad-hoc dentro do handler.
 
-Quando a regra for "owner ou permissao/scope administrativo", prefira helpers standalone da
-API-BASE com `requirePolicy(...)` em vez de checks customizados no handler.
+Quando a regra for "owner ou role/permissao administrativa", prefira `config.ownership`.
+Use helpers standalone da API-BASE com `requirePolicy(...)` apenas quando a regra nao couber
+no contrato declarativo.
 
 ## Quando usar
 
 - Para rotas privadas, que sao o padrao.
 - Para selecionar `internal` ou `keycloak` por rota.
-- Para aplicar `config.roles`, `config.permissions`, `requireRole`, `requireScope` ou policies.
+- Para aplicar `config.roles`, `config.permissions`, `config.ownership`, `requireRole`, `requireScope` ou policies.
 - Para validar `id_token` de social login.
 
 ## Quando nao usar
 
 - Nao aceite claims sem validacao.
 - Nao replique logica de auth dentro do handler.
-- Nao use `config.auth.public = true` em rotas que tambem declaram `config.roles` ou `config.permissions`.
+- Nao use `config.auth.public = true` em rotas que tambem declaram `config.roles`, `config.permissions` ou `config.ownership`.
+- Nao use `preHandler` manual para regras que cabem em `config.ownership`.
 
 ## Contrato canonico
 
@@ -55,7 +58,7 @@ Regras:
 
 - `jwtAuthPlugin` registra validacao do token e os decorators de auth.
 - `authGuardPlugin` aplica auth global quando `AUTH_GUARD_ENABLED=true`.
-- `permissionsGuardPlugin` aplica `config.roles` e `config.permissions`.
+- `permissionsGuardPlugin` aplica `config.roles`, `config.permissions` e `config.ownership`.
 - Se o projeto usa social auth, registre tambem o plugin social ou use o runtime que ja o registra no `createApp`.
 - Se o projeto usa cache para resolver permissoes dinamicas, registre o cache antes de decorar `resolvePermissions`.
 
@@ -92,11 +95,11 @@ Use esta tabela como regra de precedencia:
 
 | Caso | Resultado esperado |
 | --- | --- |
-| `config.auth.public = true` e sem `config.roles`/`config.permissions` | rota publica |
-| `config.auth.public = true` e com `config.roles` ou `config.permissions` | rota privada; `permissionsGuardPlugin` prevalece |
+| `config.auth.public = true` e sem `config.roles`/`config.permissions`/`config.ownership` | rota publica |
+| `config.auth.public = true` e com `config.roles`, `config.permissions` ou `config.ownership` | rota privada; `permissionsGuardPlugin` prevalece |
 | `AUTH_GUARD_ENABLED=true` e rota sem `config.auth.public = true` | auth obrigatoria antes do handler |
-| `AUTH_GUARD_ENABLED=false` e rota sem `config.roles`/`config.permissions` | auth so ocorre se `preHandler` chamar decorators manualmente |
-| rota com `config.roles` ou `config.permissions` | auth obrigatoria, mesmo com `AUTH_GUARD_ENABLED=false` |
+| `AUTH_GUARD_ENABLED=false` e rota sem `config.roles`/`config.permissions`/`config.ownership` | auth so ocorre se `preHandler` chamar decorators manualmente |
+| rota com `config.roles`, `config.permissions` ou `config.ownership` | auth obrigatoria, mesmo com `AUTH_GUARD_ENABLED=false` |
 | rota com `config.auth.provider` | usa o provider da rota |
 | rota sem `config.auth.provider` | usa `JWT_DEFAULT_AUTH_PROVIDER` |
 | rota em `AUTH_PUBLIC_ROUTES` ou `AUTH_PUBLIC_PATH_PREFIXES` | publica, salvo se `config.roles`/`config.permissions` tornarem a rota privada |
@@ -190,6 +193,69 @@ Notas:
 - isso melhora Swagger, reduz codigo manual e deixa a intencao da rota explicita;
 - `permissionsGuardPlugin` faz a validacao antes do handler.
 
+### 3.1. Rota privada com ownership declarativo
+
+Este e o padrao preferido para "owner ou bypass por role e/ou permissao".
+
+```ts
+import { z } from 'zod';
+
+import { defineZodRoute } from '@/http/zod';
+
+export default defineZodRoute({
+  options: {
+    config: {
+      permissions: ['subscription.read_own'],
+      ownership: {
+        path: 'query.accountId',
+        bypassPermissions: ['admin.subscriptions.manage'],
+      },
+    },
+    schema: {
+      querystring: z.object({
+        accountId: z.string().uuid(),
+      }).strict(),
+      response: { 200: z.object({ ok: z.boolean() }) },
+    },
+  },
+  handler: async () => ({ ok: true }),
+});
+```
+
+Notas:
+
+- `ownership.path` aponta para o identificador do dono na request;
+- `bypassRoles` e `bypassPermissions` sao opcionais;
+- se `ownership` existir, a rota ja passa a ser privada;
+- use este formato antes de cair para `preHandler` manual.
+
+Exemplo com bypass por role:
+
+```ts
+import { z } from 'zod';
+
+import { defineZodRoute } from '@/http/zod';
+
+export default defineZodRoute({
+  options: {
+    config: {
+      permissions: ['subscription.read_own'],
+      ownership: {
+        path: 'query.accountId',
+        bypassRoles: ['admin'],
+      },
+    },
+    schema: {
+      querystring: z.object({
+        accountId: z.string().uuid(),
+      }).strict(),
+      response: { 200: z.object({ ok: z.boolean() }) },
+    },
+  },
+  handler: async () => ({ ok: true }),
+});
+```
+
 ### 4. Rota privada com provider `keycloak`
 
 ```ts
@@ -244,8 +310,8 @@ export default defineZodRoute({
 });
 ```
 
-Quando a regra combinar ownership com escopo/permissao administrativa, prefira o helper
-standalone e passe-o para `requirePolicy(...)`:
+Quando a regra de ownership nao couber em `config.ownership`, prefira o helper standalone e
+passe-o para `requirePolicy(...)`:
 
 ```ts
 import { createScopeOrOwnerPolicy } from '@sebrae/api-base';
@@ -287,8 +353,8 @@ export default defineZodRoute({
 
 ### 6. Rota privada sem guard global
 
-Quando `AUTH_GUARD_ENABLED=false`, toda rota privada sem `config.roles`/`config.permissions`
-precisa validar auth manualmente:
+Quando `AUTH_GUARD_ENABLED=false`, toda rota privada sem `config.roles`/`config.permissions`/
+`config.ownership` precisa validar auth manualmente:
 
 ```ts
 import { z } from 'zod';
