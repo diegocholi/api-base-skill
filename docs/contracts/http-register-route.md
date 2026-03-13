@@ -61,6 +61,23 @@ Observação sobre multipart:
 - O loader `registerRoutes` resolve o arquivo e registra a rota.
 - `registerRoute` injeta respostas `400` e `500` automaticamente.
 
+## Como um code agent decide usar este contrato
+
+- se a tarefa criar rota nova, comece pelo caminho do arquivo em `src/http/routes/**` antes de pensar no handler;
+- depois escolha o metodo pelo nome do arquivo (`get.route.ts`, `post.route.ts`, etc);
+- complete `params`, `querystring`, `body` e `response` antes de implementar a logica;
+- se a rota for privada, abra tambem [Autenticacao e guards](./security-auth.md);
+- se o consumidor ainda usar `satisfies RouteModule`, preserve o padrao local e nao force migracao para `defineZodRoute` sem necessidade.
+
+Sequencia recomendada:
+
+1. escolher o path do arquivo;
+2. definir o verbo HTTP;
+3. preencher `options.schema`;
+4. aplicar auth/publicidade da rota;
+5. implementar handler;
+6. validar com `pnpm api-cli routes:validate` ou o comando equivalente do projeto.
+
 ## Erros e códigos de status
 
 - Em `NODE_ENV=development|test`, faltas de schema geram `RouteSchemaError`.

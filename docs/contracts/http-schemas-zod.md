@@ -57,6 +57,21 @@ Nesse caso:
 - o runtime continua entregando `request.body` no formato do multipart do Fastify;
 - o `body` documental não é validado contra esse shape interno do multipart.
 
+## Como um code agent decide usar este contrato
+
+- em rota HTTP comum, prefira Zod em `params`, `querystring`, `body` e `response`;
+- em multipart documentado no Swagger, aceite JSON Schema apenas no `body` documental e mantenha Zod no restante;
+- fora do fluxo HTTP, use `parseWithZod` para validar entrada antes do caso de uso;
+- centralize schemas em `schemas/` quando eles forem reutilizados por mais de uma rota ou caso de uso;
+- para schema pequeno e local a uma unica rota, inline e aceitavel se isso reduzir dispersao desnecessaria.
+
+Guia rapido de escolha:
+
+- rota HTTP comum: `defineZodRoute` + Zod em tudo;
+- rota multipart com Swagger: `defineZodRoute` + JSON Schema no `body` + Zod no restante;
+- validacao fora de rota: `parseWithZod`;
+- consumidor legado com parse manual: manter compatibilidade e evitar refactor estrutural sem necessidade.
+
 ## Exemplos
 
 ### Básico

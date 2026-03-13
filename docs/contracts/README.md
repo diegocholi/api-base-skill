@@ -2,6 +2,12 @@
 
 Este indice detalha contratos proximos da implementacao da base. Para a jornada de uso do consumidor, comece por [Visao geral](../overview.md) e [API](../api.md).
 
+Limite de escopo para code agents:
+
+- esta pagina cobre contratos publicos usados por consumidores;
+- nao desvie para `docs/project-base/*` a menos que a tarefa trate da manutencao da base, do monorepo ou da paridade do scaffold;
+- para tarefas normais de servico consumidor, permaneça nesta area e nos guias de `docs/*`.
+
 Ordem recomendada para code agents:
 
 1. Abra [Rotas por pasta](./http-register-route.md) antes de criar ou mover rotas.

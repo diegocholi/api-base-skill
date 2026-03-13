@@ -43,7 +43,7 @@ Esse comando:
 Depois de gerar a migration, aplique normalmente:
 
 ```bash
-pnpm run db:migrate
+pnpm api-cli db migrate
 ```
 
 ## Como usar
@@ -71,7 +71,7 @@ await db.transaction(async (tx) => {
 
 ## Falhas comuns
 
-- Tabela `outbox` ausente: rode `pnpm run db:enable-outbox` e depois `pnpm run db:migrate`.
+- Tabela `outbox` ausente: rode `pnpm api-cli db enable-outbox` ou o script equivalente e depois `pnpm api-cli db migrate` ou o comando real de migracao do projeto.
 - `DB_URL` ausente impede o worker de iniciar.
 - `REDIS_URL` ausente impede publicacao no queue.
 - Payloads grandes devem ser evitados.

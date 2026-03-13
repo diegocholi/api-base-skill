@@ -2,6 +2,13 @@
 
 Esta referência reúne os pontos de contato mais usados por quem consome a API-BASE.
 
+Como um code agent deve usar esta pagina:
+
+- use esta referencia para descobrir exports, tipos e comandos validos da base;
+- nao trate esta pagina como garantia de que todo consumidor expoe todos os scripts mostrados aqui;
+- confirme sempre os scripts reais no `package.json` do consumidor antes de sugerir execucao;
+- quando a tarefa tocar auth, rotas, multipart, erros, cache ou fila, abra tambem o contrato canonico correspondente.
+
 ## Exports principais de `@sebrae/api-base`
 
 Bootstrap:
@@ -33,6 +40,9 @@ Observação sobre multipart:
 - use essa opcao apenas para desligar ou customizar o `@fastify/multipart`.
 - exemplos comuns de customizacao: `attachFieldsToBody`, `limits.fileSize`, `limits.parts` e `throwFileSizeLimit`.
 - detalhes de runtime e exemplos completos: [Multipart](./multipart.md).
+- auth, RBAC e social auth: [Autenticacao e guards](./contracts/security-auth.md).
+- erros HTTP: [AppError e erros HTTP](./contracts/shared-errors.md) e [Handler de erros global](./contracts/http-error-handler.md).
+- cache e filas: [CacheService e KeyBuilder](./contracts/data-cache.md) e [QueueService, jobs e workers](./contracts/data-queue.md).
 
 Erros e resultado:
 
@@ -145,9 +155,9 @@ Referência completa:
 
 1. `pnpm api-cli generate module billing --crud`
 2. `pnpm api-cli routes:validate`
-3. `pnpm run db:migrate:env`
-4. `pnpm run dev`
-5. `pnpm run build && pnpm run start:env`
+3. rode `pnpm api-cli db migrate` ou o script equivalente existente no `package.json`
+4. rode `pnpm api-cli dev` ou o script `dev` disponivel no consumidor
+5. valide `build` e `start` usando apenas scripts que existirem no projeto real
 
 ## Referência complementar
 

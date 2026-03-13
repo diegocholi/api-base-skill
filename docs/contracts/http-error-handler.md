@@ -38,12 +38,19 @@ app.register(errorHandlerPlugin, { env });
 - `ZodError` e erros de validação viram `ValidationError` (400).
 - Erro desconhecido vira `INTERNAL_ERROR` (500) com details apenas fora de prod.
 
+## Como um code agent decide usar este contrato
+
+- para falha esperada de negocio, lance `AppError` ou uma subclasse apropriada;
+- para erro de validacao de schema, deixe o runtime converter sem `try/catch` manual;
+- para bug, estado impossivel ou erro desconhecido, nao masqueie o erro so para caber no contrato;
+- nao capture erro no handler apenas para remapear resposta HTTP.
+
 ## Exemplos
 
 ### Básico
 
 ```ts
-import { NotFoundError } from '@/shared/errors';
+import { NotFoundError } from '@sebrae/api-base';
 
 export const handler = async () => {
   throw new NotFoundError('User not found');
@@ -53,7 +60,7 @@ export const handler = async () => {
 ### Avançado
 
 ```ts
-import { AppError } from '@/shared/errors';
+import { AppError } from '@sebrae/api-base';
 
 export const handler = async () => {
   throw new AppError({

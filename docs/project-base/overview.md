@@ -17,4 +17,10 @@ Use `docs/project-base/*` quando o assunto envolver:
 - validação de paridade entre runtime, CLI e scaffold;
 - manutenção interna da base.
 
+Para code agents:
+
+- nao abra `docs/project-base/*` por padrao em tarefas de consumidor;
+- use esta area apenas quando o objetivo for manter a base, o monorepo ou a paridade entre scaffold e runtime;
+- se a tarefa for criar rota, modulo, auth, cache, fila ou operacao de um consumidor, permaneça em `docs/*` de consumidor.
+
 Se o objetivo for construir ou operar um serviço consumidor, comece por [Visão geral](../overview.md).

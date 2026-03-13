@@ -76,6 +76,6 @@ pnpm api-cli migrate --dry-run
 ## Próximos passos
 
 1. Ajuste o `.env` com base em [Variáveis de ambiente](./env.md).
-2. Rode `pnpm run db:migrate:env`.
-3. Suba a API com `pnpm run dev`.
+2. Rode `pnpm api-cli db migrate` ou o script equivalente existente no `package.json`.
+3. Suba a API com `pnpm api-cli dev` ou com o script `dev` do consumidor.
 4. Consulte [Arquitetura](./architecture.md), [API](./api.md) e [Exemplos](./examples.md).

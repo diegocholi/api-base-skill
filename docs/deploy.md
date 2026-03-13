@@ -4,7 +4,7 @@ Este guia cobre apenas decisões operacionais do serviço consumidor.
 
 ## Antes do rollout
 
-- execute `pnpm run db:migrate` antes de subir novas réplicas;
+- execute o comando real de migracao do projeto antes de subir novas réplicas, normalmente `pnpm api-cli db migrate` ou `pnpm run db:migrate`;
 - garanta que `ENV_FALLBACK_ENABLED=false` em produção;
 - revise `HTTP_TRUST_PROXY`, CORS, rate limit, auth e métricas conforme o ambiente.
 
@@ -30,7 +30,7 @@ spec:
 Step no pipeline:
 
 ```bash
-pnpm run db:migrate
+pnpm api-cli db migrate
 ```
 
 Init container, quando aceito pelo ambiente:
@@ -39,7 +39,7 @@ Init container, quando aceito pelo ambiente:
 initContainers:
   - name: migrate
     image: your-image:tag
-    command: ['pnpm', 'run', 'db:migrate']
+    command: ['pnpm', 'api-cli', 'db', 'migrate']
 ```
 
 ## Boas práticas

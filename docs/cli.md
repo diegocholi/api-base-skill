@@ -445,9 +445,9 @@ export default defineZodRoute({
 3. `pnpm api-cli init` ou `pnpm api-cli init --with-example`
 4. `pnpm api-cli env check`
 5. `pnpm api-cli routes:validate`
-6. `pnpm run db:migrate:env`
-7. `pnpm run dev`
-8. `pnpm run build && pnpm run start:env`
+6. rode `pnpm api-cli db migrate` ou o script equivalente existente no `package.json`
+7. rode `pnpm api-cli dev` ou o script `dev` real do consumidor
+8. valide `build` e `start` apenas com scripts que existirem no projeto
 
 ## Relação com a documentação central
 
