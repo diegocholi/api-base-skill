@@ -60,6 +60,10 @@ Abra nesta ordem:
 5. `docs/examples.md`
 6. `docs/testing.md`
 
+Se a tarefa envolver auth, RBAC, ownership ou escopo por recurso, abra tambem:
+
+7. `docs/contracts/security-auth.md`
+
 ## 3. Escolher entre scaffold e edicao manual
 
 Prefira scaffold da CLI quando:
@@ -73,6 +77,12 @@ Prefira edicao manual quando:
 - a tarefa alterar comportamento de codigo ja customizado;
 - o consumidor estiver parcialmente legado;
 - a mudanca envolver regras de negocio, auth, observabilidade ou integracoes especificas.
+
+Para auth e autorizacao contextual:
+
+- prefira `config.roles` e `config.permissions` quando a regra for estatica por rota;
+- use `requirePolicy(...)` quando a regra depender de ownership ou escopo dinamico;
+- prefira os helpers publicos `createOwnerOnlyPolicy`, `createRoleOrOwnerPolicy` e `createScopeOrOwnerPolicy` em vez de duplicar checks imperativos no handler.
 
 ## 4. Validar depois da mudanca
 
@@ -109,6 +119,7 @@ Se um script nao existir, nao invente outro. Procure primeiro em `package.json` 
 - `docs/architecture.md`
 - `docs/api.md`
 - `docs/contracts/README.md`
+- `docs/contracts/security-auth.md`
 - `docs/examples.md`
 - `docs/testing.md`
 

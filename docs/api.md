@@ -56,6 +56,9 @@ Dados e utilitários:
 
 - `RepoBase`
 - `sql`
+- `createOwnerOnlyPolicy`
+- `createRoleOrOwnerPolicy`
+- `createScopeOrOwnerPolicy`
 - `createGoogleIdTokenVerifier`
 - `createId`
 - `generateClientId`

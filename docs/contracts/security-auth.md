@@ -23,6 +23,9 @@ Ao editar ou gerar codigo no consumidor, siga esta ordem:
 5. Se `AUTH_GUARD_ENABLED=false`, toda rota privada sem `config.roles`/`config.permissions` precisa chamar `request.server.requireAuth` manualmente.
 6. Nunca implemente auth ad-hoc dentro do handler.
 
+Quando a regra for "owner ou permissao/scope administrativo", prefira helpers standalone da
+API-BASE com `requirePolicy(...)` em vez de checks customizados no handler.
+
 ## Quando usar
 
 - Para rotas privadas, que sao o padrao.
@@ -66,6 +69,12 @@ Regras:
 - `app.ownerOnly(paramPath)`
 - `app.roleOrOwner(role, paramPath)`
 - `app.verifySocialIdToken({ provider, idToken, nonce? })`
+
+### Helpers standalone expostos
+
+- `createOwnerOnlyPolicy(paramPath)`
+- `createRoleOrOwnerPolicy(role, paramPath)`
+- `createScopeOrOwnerPolicy(scope, paramPath)`
 
 ### Variaveis de ambiente principais
 
@@ -229,6 +238,47 @@ export default defineZodRoute({
 
       await requireAuth(request, reply);
       await ownerOnly(request, reply);
+    },
+  },
+  handler: async () => ({ ok: true }),
+});
+```
+
+Quando a regra combinar ownership com escopo/permissao administrativa, prefira o helper
+standalone e passe-o para `requirePolicy(...)`:
+
+```ts
+import { createScopeOrOwnerPolicy } from '@sebrae/api-base';
+import { z } from 'zod';
+
+import { defineZodRoute } from '@/http/zod';
+
+const allowOwnSubscriptionOrAdmin = createScopeOrOwnerPolicy(
+  'admin.subscriptions.manage',
+  'query.accountId',
+);
+
+export default defineZodRoute({
+  options: {
+    schema: {
+      querystring: z.object({
+        accountId: z.string().uuid(),
+      }),
+      response: { 200: z.object({ ok: z.boolean() }) },
+    },
+    preHandler: async (request, reply) => {
+      const requireAuth = request.server.requireAuth;
+      const requirePolicy = request.server.requirePolicy?.(allowOwnSubscriptionOrAdmin, {
+        name: 'allowOwnSubscriptionOrAdmin',
+      });
+
+      if (!requireAuth || !requirePolicy) {
+        reply.code(503);
+        throw new Error('Auth guard not configured');
+      }
+
+      await requireAuth(request, reply);
+      await requirePolicy(request, reply);
     },
   },
   handler: async () => ({ ok: true }),
