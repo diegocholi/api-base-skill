@@ -23,6 +23,17 @@ Papéis principais:
 - `src/infra`: adaptações locais de banco, cache, filas e integrações.
 - `src/shared`: utilitários compartilhados do serviço.
 
+## O que verificar antes de assumir o scaffold atual
+
+Para code agents, esta checagem vem antes de qualquer geracao ou refactor grande:
+
+1. confirme as versoes de `@sebrae/api-base` e `@sebrae/api-base-cli` no `package.json` e lockfile;
+2. confirme se existem wrappers locais como `src/http/zod.ts`, `src/config/env.ts` e `src/http/types.ts`;
+3. confirme se `src/server.ts` usa `createApp<AppEnv>({ env, routesDir })` ou um bootstrap mais antigo;
+4. confirme se os scripts de `build`, `dev`, `db:*` e `routes:*` realmente existem no `package.json`.
+
+Se esses sinais nao aparecerem, trate o consumidor como parcialmente legado e preserve os padroes locais antes de tentar normalizar tudo.
+
 ## Imports e fronteiras
 
 Use dois padrões de import:
@@ -108,6 +119,12 @@ Scripts esperados no consumidor:
 ```
 
 No build, `api-cli routes:prepare-build` remove a rota de debug `__routes` do artefato final e gera o manifesto de rotas usado em produção.
+
+Observacao para code agents:
+
+- o bloco acima descreve o scaffold esperado, nao uma garantia;
+- se `clean`, `build` ou `start:env` nao existirem no projeto real, use os scripts disponiveis;
+- nao introduza scripts novos sem necessidade so para alinhar o consumidor ao exemplo.
 
 ## Onde aprofundar
 

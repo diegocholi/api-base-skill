@@ -79,6 +79,13 @@ throw new AppError({
 });
 ```
 
+## Como um code agent decide usar este contrato
+
+- se a falha for esperada de negocio, use uma subclasse pronta de `AppError` ou uma instancia operacional;
+- se a falha vier de validacao HTTP ou Zod, deixe o runtime converter para `ValidationError`;
+- se o erro for bug ou estado impossivel, nao force `AppError` apenas para caber no contrato;
+- mantenha `details` pequeno, seguro e util para diagnostico.
+
 ## Anti-padrões
 
 - Retornar string/objeto solto em vez de `AppError`.

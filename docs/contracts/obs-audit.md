@@ -46,10 +46,10 @@ audit(eventName, {
 ### Básico
 
 ```ts
-import { audit } from '@/observability/audit';
-import { createLogger } from '@/observability/logger';
+import { audit } from '@sebrae/api-base';
+import pino from 'pino';
 
-const logger = createLogger({ level: 'info', service: 'api-base', env: 'development' });
+const logger = pino({ level: 'info' });
 
 audit(
   'users.created',
@@ -65,7 +65,7 @@ audit(
 ### Avançado
 
 ```ts
-import { audit } from '@/observability/audit';
+import { audit } from '@sebrae/api-base';
 
 audit(
   'users.role_changed',
@@ -78,6 +78,13 @@ audit(
   { logger: request.log, requestId: request.requestId },
 );
 ```
+
+## Como um code agent decide usar este contrato
+
+- prefira o helper publico `audit` antes de criar wrapper novo;
+- se o consumidor ja tiver um wrapper local de observabilidade, siga o padrao local;
+- nao introduza pastas como `@/observability/*` sem confirmar que elas existem;
+- inclua `requestId` sempre que o contexto da request estiver disponivel.
 
 ## Anti-padrões
 

@@ -10,9 +10,10 @@ export default defineZodRoute({
   options: {
     config: {
       auth: { provider: 'internal' },
+      roles: ['admin'],
+      permissions: ['users:read'],
     },
     schema: {
-      security: [{ bearerAuth: [] }],
       response: {
         200: responseSchema,
       },

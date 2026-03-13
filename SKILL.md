@@ -5,59 +5,122 @@ description: Use esta skill para criar, manter, depurar e explicar projetos que 
 
 # Quando usar esta skill
 
-Use esta skill quando o repositório:
-- contiver `api-base.on`
-- tiver dependência `@sebrae/api-base` e `@sebrae/api-base-cli`
-- possuir pastas `src/http/routes` e `src/modules`
-- mencionar "api-base" em README, docs ou código
+Use esta skill quando o repositorio:
 
-Também use quando o usuário pedir para:
-- criar módulos, handlers, pipelines ou adapters do framework
-- explicar a arquitetura do framework
-- migrar código legado para o framework
-- diagnosticar erros comuns do runtime do framework
+- contiver `api-base.on`;
+- tiver dependencia `@sebrae/api-base` ou `@sebrae/api-base-cli`;
+- possuir pastas `src/http/routes` e `src/modules`;
+- mencionar `api-base` em README, docs ou codigo.
 
-# O que você deve saber
+Tambem use quando o usuario pedir para:
 
-A api-base é baseado em:
-- Rotas declaradas por arquivos na pasta `src/http/routes`
-- módulos declarativos na pasta `src/modules`
-- ciclo de vida `bootstrap -> init -> run -> shutdown`
-- adapters para integração externa
-- CLI para criação e manutenção de código
+- criar modulos, handlers, pipelines ou adapters do framework;
+- explicar a arquitetura do framework;
+- migrar codigo legado para o framework;
+- diagnosticar erros comuns do runtime do framework.
 
-# Regras de implementação
+# O que voce deve saber
+
+A api-base e baseada em:
+
+- rotas declaradas por arquivos em `src/http/routes`;
+- modulos declarativos em `src/modules`;
+- ciclo de vida `bootstrap -> init -> run -> shutdown`;
+- adapters para integracao externa;
+- CLI para criacao e manutencao de codigo.
+
+# Regras de implementacao
 
 - Sempre preserve a estrutura oficial do framework.
-- Prefira os helpers nativos antes de criar abstrações novas.
-- Não invente APIs que não existam na documentação.
-- Ao gerar código, siga os padrões descritos em `docs/api.md` e `docs/examples.md`.
-- Ao alterar código existente, mantenha compatibilidade com a versão atual do framework.
-- Ao criar novos módulos, valide naming, registro no container e hooks de lifecycle.
+- Prefira helpers nativos antes de criar abstracoes novas.
+- Nao invente APIs que nao existam na documentacao.
+- Ao gerar codigo, siga os padroes descritos em `docs/api.md`, `docs/contracts/README.md` e `docs/examples.md`.
+- Ao alterar codigo existente, mantenha compatibilidade com a versao atual do framework usada no consumidor.
+- Ao criar novos modulos, valide naming, registro no container e hooks de lifecycle.
+
+# Workflow para code agents
+
+## 1. Descobrir contexto do consumidor
+
+Antes de editar:
+
+1. Descubra a versao usada de `@sebrae/api-base` e `@sebrae/api-base-cli` em `package.json`, lockfile ou ambos.
+2. Confirme se o projeto foi gerado por `init` atual ou se ainda possui scaffold legado.
+3. Localize wrappers locais como `src/http/zod.ts`, `src/config/env.ts` e `src/infra/db/repo-base.ts`.
+4. Verifique se o consumidor usa `internal`, `keycloak`, cache, filas, multipart ou migrations.
+
+## 2. Ler o minimo necessario
+
+Abra nesta ordem:
+
+1. `docs/overview.md`
+2. `docs/api.md`
+3. `docs/contracts/README.md`
+4. apenas os contratos relevantes para a tarefa
+5. `docs/examples.md`
+6. `docs/testing.md`
+
+## 3. Escolher entre scaffold e edicao manual
+
+Prefira scaffold da CLI quando:
+
+- a tarefa for criar modulo, rota, use case, repo ou job novo;
+- o consumidor seguir a estrutura oficial do `init`;
+- a geracao reduzir trabalho mecanico sem quebrar customizacoes locais.
+
+Prefira edicao manual quando:
+
+- a tarefa alterar comportamento de codigo ja customizado;
+- o consumidor estiver parcialmente legado;
+- a mudanca envolver regras de negocio, auth, observabilidade ou integracoes especificas.
+
+## 4. Validar depois da mudanca
+
+No consumidor, prefira nesta ordem:
+
+1. `pnpm api-cli routes:validate` para rotas;
+2. `pnpm api-cli env check` para ambiente;
+3. `pnpm api-cli health --url ...` e `pnpm api-cli ready --url ...` se a app estiver rodando;
+4. `pnpm run test` ou o subset relevante;
+5. os checks minimos descritos em `docs/testing.md`.
+
+Se um script nao existir, nao invente outro. Procure primeiro em `package.json` e use o comando real disponivel.
 
 # Fluxo recomendado
 
-1. Identifique a versão do framework no projeto.
-2. Leia `docs/overview.md` e `docs/api.md` antes de propor mudanças grandes.
-3. Verifique exemplos em `examples/`.
-4. Gere ou edite código conforme os padrões oficiais.
-5. Valide imports, registro no container e ciclo de vida.
-6. Se houver script de validação, execute-o.
+1. Identifique a versao do framework no projeto.
+2. Leia `docs/overview.md` e `docs/api.md` antes de mudancas grandes.
+3. Abra o contrato especifico da tarefa em `docs/contracts/`.
+4. Verifique exemplos reais em `examples/`.
+5. Gere ou edite codigo conforme os padroes oficiais.
+6. Valide imports, registro no container, ciclo de vida e testes minimos.
 
-# Restrições
+# Restricoes
 
-- Não usar APIs deprecated, salvo quando o usuário pedir compatibilidade legada.
-- Não misturar padrões de versões diferentes.
-- Não mover arquivos sem necessidade.
+- Nao usar APIs deprecated, salvo quando o usuario pedir compatibilidade legada.
+- Nao misturar padroes de versoes diferentes.
+- Nao mover arquivos sem necessidade.
+- Nao assumir que scripts do consumidor existem sem confirmar em `package.json`.
+- Nao tratar exemplos desta skill como substituto do codigo real do consumidor.
 
-# Referências locais
+# Referencias locais
 
 - `docs/overview.md`
 - `docs/architecture.md`
 - `docs/api.md`
+- `docs/contracts/README.md`
 - `docs/examples.md`
+- `docs/testing.md`
 
-# Comandos úteis
+# Comandos uteis
+
+Estes comandos sao para o consumidor, nao para este repositorio da skill:
 
 ```bash
-bash scripts/validate.sh
+pnpm api-cli routes:validate
+pnpm api-cli env check
+pnpm api-cli health --url http://127.0.0.1:3000
+pnpm api-cli ready --url http://127.0.0.1:3000
+```
+
+Se o consumidor nao tiver `api-cli` instalado ou scripts normalizados, valide primeiro o `package.json` antes de sugerir comandos.

@@ -84,6 +84,13 @@ await cache.setJson(key, { id: '123' }, 300);
 await cache.delByPrefix('users');
 ```
 
+## Como um code agent decide usar este contrato
+
+- use cache apenas quando houver leitura repetida com ganho real de latencia ou custo;
+- prefira `cacheAside` como padrao antes de montar fluxo customizado;
+- reuse TTLs publicos da lib antes de criar numeros magicos;
+- confirme se o consumidor realmente tem Redis configurado antes de introduzir dependencia de cache.
+
 ## Anti-padrões
 
 - TTL infinito ou muito alto para dados volateis.

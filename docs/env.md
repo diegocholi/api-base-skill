@@ -2,6 +2,12 @@
 
 Este documento lista as variáveis mais relevantes para o consumidor. A definição canônica continua no código da base.
 
+Para code agents:
+
+- trate este arquivo como referencia de nomes e intencao das vars;
+- confirme sempre o parser real de env do consumidor antes de adicionar, remover ou renomear variaveis;
+- se o projeto tiver `src/config/env.ts`, ele prevalece sobre exemplos genericamente descritos aqui.
+
 ## Mínimo para desenvolvimento local
 
 ```env

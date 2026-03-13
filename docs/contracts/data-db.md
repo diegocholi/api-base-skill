@@ -33,7 +33,8 @@ app.register(dbPlugin, { env, createDb, pingDb, shutdownDb });
 - `app.db` disponível para repositórios.
 - checagem de prontidao `db` registrado.
 - Use `RepoBase` como base de repositórios SQL-first por módulo.
-- Não acesse `db` diretamente em handlers; encapsule em repositórios.
+- O handler pode instanciar um repositório com `request.server.db`, mas não deve escrever SQL direto no handler.
+- Em fluxos mais complexos, mova a orquestracao para caso de uso e mantenha o acesso ao banco encapsulado no repositório.
 
 ## Erros e códigos de status
 
@@ -60,7 +61,7 @@ export const handler = async (request) => {
 ### Avançado
 
 ```ts
-import { withTransaction } from '@/infra/db/transaction';
+import { UsersRepository } from '@/modules/users/infra/repos/users.repo';
 
 export const handler = async (request) => {
   const db = request.server.db;
@@ -68,12 +69,19 @@ export const handler = async (request) => {
     throw new Error('DB não configurado');
   }
 
-  return withTransaction(db, async (tx) => {
-    // usar tx em multiplas chamadas ao repo
+  return db.transaction(async (tx) => {
+    const repo = new UsersRepository(tx, request.server.env.DB_DIALECT);
     return { ok: true };
   });
 };
 ```
+
+## Como um code agent decide usar este contrato
+
+- se a rota ja usa repositorio local, preserve o padrao existente;
+- se a tarefa criar acesso novo a banco, prefira criar ou estender um repositorio do modulo;
+- so use `request.server.db` no handler para montar o repositorio ou iniciar transacao;
+- nao introduza helpers como `withTransaction` sem confirmar que eles existem no consumidor.
 
 ## Anti-padrões
 
@@ -84,6 +92,6 @@ export const handler = async (request) => {
 ## Checklist de revisão
 
 - [ ] Handler usa repositório e não SQL direto.
-- [ ] `app.db` existe antes de usar.
+- [ ] `request.server.db` existe antes de instanciar repositório ou transação.
 - [ ] Transação usada somente quando necessário.
 - [ ] Readiness check ativo para DB.

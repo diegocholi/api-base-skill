@@ -33,7 +33,7 @@ await queue.add('events', 'user.created', payload, {
 
 - `registerJobSchema(queueName, jobName, schema)` com Zod.
 - `add(queue, job, payload, options)`.
-- `startWorker()` inicia workers padrão (ver `src/infra/queue/worker.ts`).
+- `startWorker()` inicia workers padrao quando o consumidor implementa esse bootstrap.
 - `options.requestId` propaga correlacao para logs do enqueue.
 - `queuePlugin` aplica defaults: attempts=3, backoff exponencial, removeOnComplete=true.
 
@@ -41,6 +41,10 @@ await queue.add('events', 'user.created', payload, {
 
 - Job enfileirado e logado (quando logger existe).
 - Payload validado via Zod quando schema registrado.
+
+Observacao:
+
+- caminhos como `src/infra/queue/worker.ts` sao uma convencao comum do consumidor, nao um arquivo garantido pelo scaffold em todos os projetos.
 
 ## Erros e códigos de status
 
@@ -64,6 +68,13 @@ await queue.add('events', 'user.created', payload, {
   jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 1000 } },
 });
 ```
+
+## Como um code agent decide usar este contrato
+
+- se o consumidor ja tiver registro central de filas e jobs, reuse esse ponto de extensao;
+- se a tarefa so enfileira um job novo, registre schema antes do primeiro `add`;
+- nao invente worker path, bootstrap ou registry sem localizar o padrao real do consumidor;
+- trate idempotencia do processor como obrigatoria quando houver retry.
 
 ## Anti-padrões
 

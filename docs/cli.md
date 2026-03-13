@@ -20,6 +20,30 @@ Os comandos da CLI aceitam estas flags globais:
 - `--verbose`: exibe logs detalhados.
 - `--no-format`: desativa a formatação dos arquivos gerados.
 
+## Como um code agent deve usar a CLI
+
+Use a CLI como primeira opcao para gerar estrutura repetitiva. Nao use a CLI cegamente.
+
+Workflow recomendado:
+
+1. confirme se o consumidor realmente tem `@sebrae/api-base-cli` instalado;
+2. confirme a versao em `package.json` e avalie se o scaffold parece atual;
+3. rode `--dry-run` quando a mudanca criar muitos arquivos ou tocar codigo gerenciado;
+4. depois da geracao, revise imports, schemas, auth, naming e wiring;
+5. finalize com `routes:validate`, testes e smoke checks relevantes.
+
+Prefira scaffold da CLI quando:
+
+- for criar modulo, rota, repo, use case ou job novo;
+- o consumidor seguir o layout padrao do `init`;
+- a mudanca for majoritariamente estrutural.
+
+Prefira edicao manual quando:
+
+- a mudanca alterar fluxo de negocio ja customizado;
+- o consumidor estiver em scaffold legado ou divergente;
+- a tarefa envolver ajustes finos em auth, observabilidade, SQL ou integracoes.
+
 ## Comandos principais
 
 - `pnpm api-cli init`: cria a estrutura base do consumidor e normaliza scripts.
@@ -147,6 +171,13 @@ Exemplo:
 pnpm api-cli generate module billing --crud --auth
 ```
 
+Pos-geracao recomendada:
+
+1. revise o schema da rota e a resposta `2xx`;
+2. confirme se o caso de uso e o repo gerados combinam com o dominio real;
+3. ajuste auth declarativa conforme [Autenticacao e guards](./contracts/security-auth.md);
+4. rode `pnpm api-cli routes:validate`.
+
 ## `generate route`
 
 ```bash
@@ -180,6 +211,13 @@ Opções relevantes:
   sem `defineZodRoute`;
 - `--with-response-schema`: inclui schema de resposta;
 - padrão atual: a rota já é gerada com `defineZodRoute` e `options.schema`.
+
+Pos-geracao recomendada:
+
+1. complete `querystring`, `params`, `body` e `response`;
+2. se a rota for publica, declare `config.auth.public = true`;
+3. se a rota for privada com RBAC estatico, prefira `config.roles` e `config.permissions`;
+4. valide o arquivo com `pnpm api-cli routes:validate`.
 
 ## `generate usecase`
 
@@ -278,6 +316,12 @@ pnpm api-cli migrate --dry-run
 pnpm api-cli migrate consumer-scripts-v2 --dry-run
 ```
 
+Quando usar esse comando como code agent:
+
+- quando o consumidor tiver wrappers ou scripts claramente legados;
+- antes de aplicar mudancas grandes que dependam do scaffold atual;
+- sempre preferindo `--dry-run` na primeira execucao.
+
 ## Ambiente e saúde
 
 ### `env check`
@@ -327,6 +371,12 @@ pnpm api-cli db migrate
 
 São wrappers para os scripts de banco já normalizados no consumidor.
 
+Observacao para code agents:
+
+- nem todo consumidor tera os mesmos scripts de banco no `package.json`;
+- quando houver divergencia, use primeiro o comando real disponivel no projeto;
+- nao assuma a existencia de `db:migrate:env` sem verificar.
+
 ## Convenções importantes
 
 ### Rotas por arquivo
@@ -337,6 +387,28 @@ src/http/routes/
   users/[id]/get.route.ts
   users/[id]/posts/get.route.ts
 ```
+
+## Sequencias prontas para tarefas comuns
+
+### Nova rota simples
+
+1. `pnpm api-cli generate route "/users/[id]" --method GET --with-response-schema`
+2. completar schema e handler
+3. `pnpm api-cli routes:validate`
+
+### Novo modulo CRUD
+
+1. `pnpm api-cli generate module billing --crud`
+2. ajustar repositorio, schema e caso de uso
+3. revisar auth e erros
+4. `pnpm api-cli routes:validate`
+
+### Projeto com scaffold legado
+
+1. `pnpm api-cli migrate --list`
+2. `pnpm api-cli migrate --dry-run`
+3. aplicar migration especifica se fizer sentido
+4. so depois gerar novos arquivos ou editar wrappers
 
 Regras:
 

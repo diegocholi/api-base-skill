@@ -18,6 +18,13 @@ Esse campo serve para:
 - explicitar o contrato HTTP da rota;
 - permitir que a validacao estrita aceite rotas multipart sem `schema.body`.
 
+Para code agents, a sequencia padrao e:
+
+1. confirmar se a rota precisa apenas receber arquivo por stream ou tambem documentar campos no Swagger;
+2. usar upload por stream como padrao mais simples;
+3. habilitar `attachFieldsToBody` so quando houver requisito claro de documentacao dos campos;
+4. nao tratar `schema.body` de multipart como garantia do shape interno de `request.body`.
+
 ## Configuracao do plugin
 
 Quando precisar customizar o comportamento do upload, passe as opcoes do
@@ -148,3 +155,10 @@ Resumo:
 - `consumes`: contrato e documentacao;
 - `schema.body`: opcional no upload por stream, necessario quando os campos do form precisam aparecer no OpenAPI.
 - em rotas híbridas, o restante do schema pode continuar em Zod.
+
+Checklist rapido para code agents:
+
+- upload simples: `request.file()` + `schema.consumes`;
+- upload com campos no Swagger: `attachFieldsToBody` + `schema.body` documental;
+- arquivo grande: evitar `toBuffer()` quando stream for suficiente;
+- validacao final: testar upload real e revisar o OpenAPI resultante.

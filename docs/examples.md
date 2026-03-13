@@ -1,11 +1,19 @@
 # Exemplos
 
-Os arquivos em `docs/examples/` mostram o uso esperado no projeto consumidor e passam no typecheck da documentação.
+Os arquivos em `examples/` mostram o uso esperado no projeto consumidor e passam no typecheck da documentacao.
 
 Observação sobre imports:
 
 - nos exemplos desta pasta, alguns imports usam `@sebrae/api-base` diretamente para manter o typecheck da documentação isolado;
 - no consumidor gerado pelo `init`, prefira wrappers locais como `@/http/zod` e `@/infra/db/repo-base` quando eles existirem.
+
+Como usar esta pagina como code agent:
+
+- nao invente bootstrap, decorators ou helpers sem antes localizar um exemplo equivalente;
+- copie o exemplo mais proximo e adapte so o necessario;
+- se a mudanca envolver auth, abra tambem [Autenticacao e guards](./contracts/security-auth.md);
+- se a mudanca envolver erro, schema ou persistencia, abra o contrato correspondente antes de editar.
+- confirme primeiro que o exemplo corresponde ao scaffold e a versao real do consumidor.
 
 ## Bootstrap e rotas
 
@@ -13,7 +21,7 @@ Observação sobre imports:
 - `typed-consumer-env-example.ts`: mostra como estender `Env` no consumidor sem casts por rota.
 - `register-route-example.ts`: rota HTTP com `defineZodRoute`, `querystring` e resposta tipada.
 - `multipart-upload-example.ts`: upload `multipart/form-data` com `request.file()` e resposta tipada.
-- `auth-protected-route-example.ts`: rota protegida pelo guard global, com `security` e provider explícito.
+- `auth-protected-route-example.ts`: rota protegida com provider explicito e RBAC declarativo via `config.roles` e `config.permissions`.
 - `auth-public-route-example.ts`: rota pública com `config.auth.public = true`.
 - `social-auth-google-example.ts`: valida `id_token` do Google e retorna identidade normalizada.
 
@@ -104,6 +112,13 @@ Observação sobre auth:
 - os exemplos desta pasta mostram o padrão recomendado para o consumidor;
 - a CLI ainda gera `preHandler` explícito quando você usa `generate route --auth` ou `generate module --auth`, para manter proteção por rota mesmo quando o guard global estiver desabilitado.
 
+Regra adicional para code agents:
+
+- para RBAC estatico, prefira `examples/auth-protected-route-example.ts` combinado com `config.roles` e `config.permissions` descritos em [Autenticacao e guards](./contracts/security-auth.md);
+- use `preHandler` manual apenas quando a regra depender de ownership, policy customizada ou auth sem guard global;
+- se um exemplo e o contrato divergirem, siga o contrato e ajuste o exemplo do consumidor conforme necessario.
+- os exemplos desta pasta devem permanecer alinhados com os contratos; se voce atualizar um contrato canonico, atualize o exemplo correspondente no mesmo fluxo.
+
 Observação sobre multipart:
 
 - o runtime registra `@fastify/multipart` no `createApp()` por padrão;
@@ -114,6 +129,12 @@ Observação sobre multipart:
 - para o Swagger UI abrir o seletor de arquivo, documente o campo com `type: 'string'` e `format: 'binary'`;
 - para limites e exemplos completos de bootstrap, consulte [Multipart](./multipart.md).
 
+Politica de consistencia:
+
+- contratos canonicos definem o comportamento recomendado;
+- exemplos devem ilustrar esse comportamento sem depender de inferencia adicional;
+- quando um exemplo precisar mostrar uma excecao ao padrao, isso deve estar explicito no proprio doc e no codigo do exemplo.
+
 ## Referências relacionadas
 
 - [Arquitetura](./architecture.md)
@@ -121,3 +142,12 @@ Observação sobre multipart:
 - [OpenAPI](./openapi.md)
 - [Multipart](./multipart.md)
 - [Padrões](./standards.md)
+
+## Mapa rapido de escolha
+
+- bootstrap da app: `examples/server-example.ts`
+- rota publica: `examples/auth-public-route-example.ts`
+- rota privada com guard global: `examples/auth-protected-route-example.ts`
+- social auth Google: `examples/social-auth-google-example.ts`
+- validacao fora do HTTP: `examples/parse-with-zod-example.ts`
+- fila, cache e repositorio: `examples/queue-job-example.ts`, `examples/cache-aside-example.ts`, `examples/repo-base-example.ts`

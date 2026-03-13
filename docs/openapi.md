@@ -17,6 +17,13 @@ As duas podem ser alteradas por `SWAGGER_DOCS_ROUTE` e `SWAGGER_OPENAPI_ROUTE`.
 
 O OpenAPI é gerado a partir de `options.schema` das rotas. No consumidor, prefira `defineZodRoute`.
 
+Para code agents, a regra pratica e:
+
+1. declare `params`, `querystring`, `body` e `response` no schema;
+2. deixe `security` automatico quando a rota estiver protegida pelo contrato padrao de auth;
+3. use `schema.security` manual apenas quando precisar sobrescrever o comportamento padrao;
+4. valide primeiro se o consumidor realmente expoe scripts de OpenAPI antes de sugerir geracao ou lint.
+
 ```ts
 import { z } from 'zod';
 
@@ -77,6 +84,14 @@ schema: {
 Para detalhes de runtime, limites de upload e exemplos completos, consulte
 [Multipart](./multipart.md).
 
+Fluxo recomendado para rota multipart documentada:
+
+1. no bootstrap, habilite `attachFieldsToBody` apenas se os campos do form precisarem aparecer no Swagger UI;
+2. na rota, declare `schema.consumes = ['multipart/form-data']`;
+3. adicione `schema.body` em JSON Schema apenas para documentacao dos campos;
+4. no handler, use `request.file()`, `request.files()` ou `request.body` no formato real do Fastify multipart;
+5. valide o fluxo manualmente no Swagger UI ou com o endpoint OpenAPI exposto.
+
 ## Rotas protegidas
 
 Quando a rota exigir autenticação, o plugin de Swagger normalmente injeta `security`
@@ -106,6 +121,9 @@ Rotas públicas podem declarar `config.auth.public = true`.
 pnpm run openapi:generate
 pnpm run openapi:lint
 ```
+
+Esses comandos so devem ser sugeridos quando existirem no `package.json` do projeto atual.
+Nao assuma que todo consumidor gerado pela CLI mantem scripts de geracao estatica do OpenAPI.
 
 ## Variáveis relacionadas
 
