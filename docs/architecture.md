@@ -57,6 +57,9 @@ O `init` gera `src/server.ts` com este fluxo:
 3. inicializa tracing apenas quando `OTEL_ENABLED=true`;
 4. registra shutdown gracioso.
 
+Se o consumidor precisar decorators ou integrações locais, registre plugins próprios depois do
+`createApp(...)` e antes do `listen(...)`. Para esse padrão, consulte [Plugins do consumidor](./plugins.md).
+
 ## Rotas por arquivo
 
 As rotas ficam em `src/http/routes` e seguem a árvore de diretórios:

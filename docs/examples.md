@@ -18,6 +18,7 @@ Como usar esta pagina como code agent:
 ## Bootstrap e rotas
 
 - `server-example.ts`: sobe a API com `createApp` e resolve `src/http/routes` no dev e `dist/http/routes` no build.
+- `auth-rbac-plugin-example.ts`: plugin custom do consumidor para registrar `resolveRoles` e `resolvePermissions`.
 - `typed-consumer-env-example.ts`: mostra como estender `Env` no consumidor sem casts por rota.
 - `register-route-example.ts`: rota HTTP com `defineZodRoute`, `querystring` e resposta tipada.
 - `multipart-upload-example.ts`: upload `multipart/form-data` com `request.file()` e resposta tipada.
@@ -100,6 +101,7 @@ audit(
 ## Quando usar cada exemplo
 
 - Comece por `server-example.ts` ao montar o bootstrap do consumidor.
+- Use `auth-rbac-plugin-example.ts` quando o consumidor precisar um plugin local para RBAC dinâmico ou decorators compartilhados.
 - Use `register-route-example.ts`, `multipart-upload-example.ts`, `auth-protected-route-example.ts` e `auth-public-route-example.ts` como base para novas rotas.
 - Use `parse-with-zod-example.ts` quando a validação não estiver dentro de um handler HTTP.
 - Use `result-example.ts` para casos de uso que não devem lançar exceções em falhas esperadas.
@@ -146,6 +148,7 @@ Politica de consistencia:
 ## Mapa rapido de escolha
 
 - bootstrap da app: `examples/server-example.ts`
+- plugin local de RBAC: `examples/auth-rbac-plugin-example.ts`
 - rota publica: `examples/auth-public-route-example.ts`
 - rota privada com guard global: `examples/auth-protected-route-example.ts`
 - social auth Google: `examples/social-auth-google-example.ts`

@@ -64,6 +64,11 @@ Se a tarefa envolver auth, RBAC, ownership ou escopo por recurso, abra tambem:
 
 7. `docs/contracts/security-auth.md`
 
+Se a tarefa envolver plugin custom do consumidor, decorators locais ou bootstrap com `app.register(...)`,
+abra tambem:
+
+8. `docs/plugins.md`
+
 ## 3. Escolher entre scaffold e edicao manual
 
 Prefira scaffold da CLI quando:
@@ -125,6 +130,7 @@ Se um script nao existir, nao invente outro. Procure primeiro em `package.json` 
 - `docs/api.md`
 - `docs/contracts/README.md`
 - `docs/contracts/security-auth.md`
+- `docs/plugins.md`
 - `docs/examples.md`
 - `docs/testing.md`
 

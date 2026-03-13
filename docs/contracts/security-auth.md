@@ -155,6 +155,9 @@ Sem `resolveRoles`, a API-BASE usa `request.user.roles`.
 Sem `resolvePermissions`, a API-BASE usa `request.user.scopes`.
 `requireRole`, `requireAnyRole` e `roleOrOwner` tambem passam a respeitar `resolveRoles` quando ele existir.
 
+Se essa resolução dinâmica fizer parte de uma capacidade local do consumidor, prefira encapsular
+isso em um plugin próprio. Veja [Plugins do consumidor](../plugins.md).
+
 ### 2. Rota publica
 
 ```ts

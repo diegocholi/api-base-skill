@@ -22,10 +22,9 @@ export default defineZodRoute({
       response: { 200: responseSchema },
     },
   },
-  handler: async (request, reply) => {
+  handler: async (request) => {
     const verifySocialIdToken = request.server.verifySocialIdToken;
     if (!verifySocialIdToken) {
-      reply.code(503);
       throw new Error('Social auth plugin not configured');
     }
 
