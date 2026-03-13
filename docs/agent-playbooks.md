@@ -73,6 +73,7 @@ Se a tarefa misturar criacao com legado, trate primeiro o projeto como legado e 
 - OpenAPI incompleto: `docs/troubleshooting.md` + `docs/openapi.md` + `docs/contracts/http-schemas-zod.md`
 - erro HTTP fora do contrato: `docs/troubleshooting.md` + `docs/contracts/http-error-handler.md`
 - banco, cache ou fila: `docs/troubleshooting.md` + contratos de dados relevantes
+- `socket hang up`, timeout perto de 10 segundos ou duvida entre timeout de entrada e saida: `docs/troubleshooting.md` + `docs/env.md`
 
 ## Regras de fallback
 

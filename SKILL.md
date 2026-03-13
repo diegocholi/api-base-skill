@@ -152,6 +152,11 @@ Abra nesta ordem:
 3. `docs/api.md`
 4. o contrato tecnico correspondente ao sintoma
 
+Atalho importante para timeout:
+
+- se o sintoma mencionar `socket hang up`, timeout perto de 10 segundos ou request longa encerrada pela API, revise primeiro `docs/troubleshooting.md` e `docs/env.md` para diferenciar timeout do servidor HTTP (`HTTP_CONNECTION_TIMEOUT_MS`, `HTTP_REQUEST_TIMEOUT_MS`) de timeout do cliente de saida (`createHttpClient({ timeoutMs })`);
+- nao assuma que o problema e sempre no servidor: confirme se a falha acontece na request que entra no consumidor ou na chamada que o consumidor faz para uma API externa.
+
 ## Explicar arquitetura ou contratos
 
 Antes de responder:
@@ -194,6 +199,7 @@ Abra nesta ordem:
 - banco, repo e migration: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/data-db.md` -> `docs/contracts/data-migrations.md`
 - erros HTTP, requestId, observabilidade ou auditoria: `docs/contracts/http-error-handler.md`, `docs/contracts/http-request-id.md`, `docs/contracts/obs-logger.md`, `docs/contracts/obs-audit.md`
 - diagnostico operacional: `docs/agent-playbooks.md` -> `docs/troubleshooting.md`
+- `socket hang up`, timeout perto de 10 segundos ou duvida sobre limites HTTP: `docs/agent-playbooks.md` -> `docs/troubleshooting.md` -> `docs/env.md`
 
 # Quando ignorar a documentacao generica e priorizar o consumidor
 

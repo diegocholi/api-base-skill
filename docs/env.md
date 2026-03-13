@@ -52,6 +52,42 @@ REDIS_URL=redis://localhost:6379
 - `HTTP_KEEP_ALIVE_TIMEOUT_MS`
 - `HTTP_HEADERS_TIMEOUT_MS`
 
+### Timeouts HTTP que mais causam duvida
+
+Esses timeouts cobrem cenarios diferentes:
+
+- `HTTP_CONNECTION_TIMEOUT_MS`: tempo maximo para a conexao HTTP permanecer aberta. Default atual: `10000`. Se a API costuma falhar com `socket hang up` por volta de 10 segundos durante uma requisicao longa, este e o primeiro ajuste a revisar.
+- `HTTP_REQUEST_TIMEOUT_MS`: tempo maximo para a requisicao ser processada pelo servidor. Default atual: `60000`.
+- `HTTP_KEEP_ALIVE_TIMEOUT_MS`: tempo de keep-alive entre requests reutilizando a mesma conexao. Default atual: `72000`.
+- `HTTP_HEADERS_TIMEOUT_MS`: limite opcional para leitura de headers.
+
+Exemplo de ajuste no `.env` quando a API precisa aceitar requests mais longos:
+
+```env
+HTTP_CONNECTION_TIMEOUT_MS=30000
+HTTP_REQUEST_TIMEOUT_MS=60000
+```
+
+Importante:
+
+- esses valores afetam o servidor HTTP do consumidor, ou seja, requests entrando na sua API;
+- eles nao alteram o timeout de chamadas que o consumidor faz para APIs externas.
+
+Para chamadas de saida usando `createHttpClient`, o timeout e configurado no proprio client e o default atual e `5000` ms:
+
+```ts
+const client = createHttpClient({
+  baseUrl: env.EXTERNAL_API_URL,
+  timeoutMs: 30000,
+});
+```
+
+Tambem e possivel sobrescrever por chamada:
+
+```ts
+await client.get('/rota', { timeoutMs: 30000 });
+```
+
 ## OpenAPI
 
 - `SWAGGER_ENABLED`

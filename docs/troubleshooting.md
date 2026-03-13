@@ -67,6 +67,37 @@ Se precisar aprofundar:
 - [Autenticacao e guards](./contracts/security-auth.md)
 - [Variáveis de ambiente](./env.md)
 
+## API falha com `socket hang up` apos cerca de 10 segundos
+
+Sequencia recomendada:
+
+1. confirme se o erro acontece em uma requisicao recebida pela sua API ou em uma chamada de saida para outra API;
+2. se o erro ocorre em request longa entrando no consumidor, revise `HTTP_CONNECTION_TIMEOUT_MS`; o default atual e `10000`;
+3. se a rota realmente precisa ficar mais tempo aberta, ajuste tambem `HTTP_REQUEST_TIMEOUT_MS` conforme o comportamento esperado;
+4. se o erro ocorre quando o consumidor chama outra API, revise o `timeoutMs` do `createHttpClient`, cujo default atual e `5000`;
+5. valide em logs ou no ponto de chamada se o encerramento ocorre no servidor HTTP do consumidor ou no client HTTP de saida.
+
+Exemplo de servidor:
+
+```env
+HTTP_CONNECTION_TIMEOUT_MS=30000
+HTTP_REQUEST_TIMEOUT_MS=60000
+```
+
+Exemplo de cliente HTTP:
+
+```ts
+const client = createHttpClient({
+  baseUrl: env.EXTERNAL_API_URL,
+  timeoutMs: 30000,
+});
+```
+
+Se precisar aprofundar:
+
+- [Variáveis de ambiente](./env.md)
+- [API](./api.md)
+
 ## Rotas nao aparecem
 
 Sequencia recomendada:
