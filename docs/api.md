@@ -25,7 +25,7 @@ Rotas e validação:
 - `withZod`
 - `parseWithZod`
 - `parseBody`, `parseQuery`, `parseParams` apenas por compatibilidade
-- `config.roles`, `config.permissions` e `config.ownership` na definição da rota
+- `config.roles`, `config.permissions`, `config.anyPermissions` e `config.ownership` na definição da rota
 
 Bootstrap tipado:
 
@@ -60,6 +60,7 @@ Dados e utilitários:
 - `createOwnerOnlyPolicy`
 - `createRoleOrOwnerPolicy`
 - `createScopeOrOwnerPolicy`
+- decorators opcionais no consumidor: `resolveRoles` e `resolvePermissions`
 - `createGoogleIdTokenVerifier`
 - `createId`
 - `generateClientId`
