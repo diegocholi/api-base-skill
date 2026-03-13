@@ -22,8 +22,17 @@ Rotas e validação:
 Bootstrap tipado:
 
 - `createApp<TEnv>()`
+- `createApp({ multipart: false | { ...options } })`
 - tipo `ApiBaseFastifyInstance<TEnv>`
 - tipo `ApiBaseFastifyRequest<TRouteGeneric, TEnv>`
+
+Observação sobre multipart:
+
+- `multipart` ja vem habilitado por padrão;
+- nao e necessario declarar `multipart: true`;
+- use essa opcao apenas para desligar ou customizar o `@fastify/multipart`.
+- exemplos comuns de customizacao: `attachFieldsToBody`, `limits.fileSize`, `limits.parts` e `throwFileSizeLimit`.
+- detalhes de runtime e exemplos completos: [Multipart](./multipart.md).
 
 Erros e resultado:
 

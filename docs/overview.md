@@ -54,6 +54,8 @@ Validação básica:
 - [Arquitetura](./architecture.md): estrutura do projeto consumidor e convenções.
 - [API](./api.md): exports, comandos e variáveis mais usadas.
 - [Exemplos](./examples.md): snippets para servidor, rotas, casos de uso e repositórios.
+- [OpenAPI](./openapi.md): documentação de schema e Swagger.
+- [Multipart](./multipart.md): upload, limites do plugin e documentação de arquivos no Swagger.
 
 Guias complementares:
 
@@ -61,12 +63,20 @@ Guias complementares:
 - [CLI](./cli.md)
 - [Variáveis de ambiente](./env.md)
 - [OpenAPI](./openapi.md)
+- [Multipart](./multipart.md)
 - [Migrações](./migrations.md)
 - [Workers](./workers.md)
 - [Padrões](./standards.md)
 - [Testes](./testing.md)
 - [Implantação](./deploy.md)
 - [Solução de problemas](./troubleshooting.md)
+
+Observação rápida sobre multipart:
+
+- uploads multipart funcionam por padrão no runtime;
+- `schema.consumes` documenta a rota, mas nao ativa o parser;
+- quando os campos do form precisam aparecer no Swagger, use `attachFieldsToBody` no bootstrap e `schema.body` na rota.
+- para limites, streaming e upload no Swagger UI, consulte [Multipart](./multipart.md).
 
 Conteúdo interno da base:
 

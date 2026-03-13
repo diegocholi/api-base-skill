@@ -43,6 +43,40 @@ Campos mais importantes:
 - `response`
 - `security`
 
+## Multipart no Swagger
+
+Para rotas multipart, `schema.consumes = ['multipart/form-data']` documenta a operação no OpenAPI,
+mas nao habilita o parser de upload.
+
+Quando os campos do form precisam aparecer no Swagger UI:
+
+- inicialize a app com `createApp({ multipart: { attachFieldsToBody: true } })`;
+- declare `schema.body` com JSON Schema;
+- para o campo de arquivo abrir o seletor de upload no Swagger UI, use
+  `type: 'string'` com `format: 'binary'`.
+
+Exemplo:
+
+```ts
+schema: {
+  consumes: ['multipart/form-data'],
+  body: {
+    type: 'object',
+    required: ['file'],
+    properties: {
+      file: { type: 'string', format: 'binary' },
+      folder: { type: 'string' },
+    },
+  },
+  response: {
+    201: z.object({ ok: z.literal(true) }),
+  },
+}
+```
+
+Para detalhes de runtime, limites de upload e exemplos completos, consulte
+[Multipart](./multipart.md).
+
 ## Rotas protegidas
 
 Quando a rota exigir autenticação, o plugin de Swagger normalmente injeta `security`

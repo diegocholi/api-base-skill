@@ -43,10 +43,18 @@ export interface RouteModule {
 
 - `options.schema` deve conter:
   - `params` quando a URL tem `:id`.
-  - `body` para `POST`, `PUT`, `PATCH`.
+  - `body` para `POST`, `PUT`, `PATCH`, exceto quando a rota declara `consumes: ['multipart/form-data']`.
   - `querystring` para `GET`, `DELETE`, `HEAD`.
   - `response` com algum `2xx` (ex: `200`, `201` ou `2xx`).
 - `enabled` pode desabilitar a rota via config/contexto.
+
+Observação sobre multipart:
+
+- o parser multipart ja vem habilitado no runtime;
+- `consumes: ['multipart/form-data']` nao ativa upload;
+- esse campo documenta a rota e informa ao validador que `schema.body` pode ser omitido;
+- use `schema.body` apenas quando quiser expor os campos do form-data no OpenAPI, normalmente junto com `attachFieldsToBody` no bootstrap.
+- para configuracao do plugin e exemplos completos, consulte [Multipart](../multipart.md).
 
 ### Saidas
 
@@ -97,6 +105,34 @@ export default defineZodRoute({
   handler: async (request, reply) => {
     reply.code(201);
     return { id: 'user-123', name: request.body.name };
+  },
+});
+```
+
+### Multipart
+
+```ts
+import { z } from 'zod';
+import { ValidationError } from '@sebrae/api-base';
+import { defineZodRoute } from '@/http/zod';
+
+export default defineZodRoute({
+  options: {
+    schema: {
+      consumes: ['multipart/form-data'],
+      response: {
+        201: z.object({ ok: z.literal(true), filename: z.string() }),
+      },
+    },
+  },
+  handler: async (request, reply) => {
+    const file = await request.file();
+    if (!file) {
+      throw new ValidationError('Arquivo nao enviado');
+    }
+
+    reply.code(201);
+    return { ok: true, filename: file.filename };
   },
 });
 ```

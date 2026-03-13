@@ -8,6 +8,7 @@ Padronizar validação de requisição/resposta com Zod e gerar tipos consistent
 
 - Para qualquer schema de `params`, `querystring`, `body` e `response`.
 - Para inferir tipos de DTOs com `z.infer`.
+- Para multipart com Swagger, voce pode misturar JSON Schema em `body` e manter Zod no restante.
 
 ## Quando NÃO usar
 
@@ -29,6 +30,8 @@ const app = withZod(fastify());
 
 - Schemas Zod para requisição e resposta.
 - `defineZodRoute` para inferência de tipos de `request`.
+- `defineZodRoute` aceita rotas híbridas: partes como `params`, `querystring` e `response` podem continuar em Zod enquanto `body` usa JSON Schema.
+- `defineZodRoute` aceita JSON Schema em campos como `body` quando a rota precisar documentar `multipart/form-data`.
 - `parseWithZod` para validações fora do fluxo HTTP.
 - `parseBody`, `parseParams` e `parseQuery` apenas para compatibilidade legada.
 
@@ -40,7 +43,19 @@ const app = withZod(fastify());
 ## Erros e códigos de status
 
 - Falhas de Zod geram `ValidationError` (400).
+- Falhas de JSON Schema puro geram erros de validação do Fastify/AJV (400).
 - Details incluem `issues` com path e message.
+
+## Observacao sobre rotas híbridas
+
+Quando a rota usa multipart com `attachFieldsToBody`, o `schema.body` em JSON Schema
+serve principalmente para documentacao no OpenAPI/Swagger.
+
+Nesse caso:
+
+- o Swagger usa o `schema.body` para renderizar os campos do form;
+- o runtime continua entregando `request.body` no formato do multipart do Fastify;
+- o `body` documental não é validado contra esse shape interno do multipart.
 
 ## Exemplos
 

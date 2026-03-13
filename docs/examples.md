@@ -12,6 +12,7 @@ Observação sobre imports:
 - `server-example.ts`: sobe a API com `createApp` e resolve `src/http/routes` no dev e `dist/http/routes` no build.
 - `typed-consumer-env-example.ts`: mostra como estender `Env` no consumidor sem casts por rota.
 - `register-route-example.ts`: rota HTTP com `defineZodRoute`, `querystring` e resposta tipada.
+- `multipart-upload-example.ts`: upload `multipart/form-data` com `request.file()` e resposta tipada.
 - `auth-protected-route-example.ts`: rota protegida pelo guard global, com `security` e provider explícito.
 - `auth-public-route-example.ts`: rota pública com `config.auth.public = true`.
 - `social-auth-google-example.ts`: valida `id_token` do Google e retorna identidade normalizada.
@@ -91,7 +92,7 @@ audit(
 ## Quando usar cada exemplo
 
 - Comece por `server-example.ts` ao montar o bootstrap do consumidor.
-- Use `register-route-example.ts`, `auth-protected-route-example.ts` e `auth-public-route-example.ts` como base para novas rotas.
+- Use `register-route-example.ts`, `multipart-upload-example.ts`, `auth-protected-route-example.ts` e `auth-public-route-example.ts` como base para novas rotas.
 - Use `parse-with-zod-example.ts` quando a validação não estiver dentro de um handler HTTP.
 - Use `result-example.ts` para casos de uso que não devem lançar exceções em falhas esperadas.
 - Use `repo-base-example.ts`, `cache-aside-example.ts` e `queue-job-example.ts` como referência para acesso a infraestrutura.
@@ -103,9 +104,20 @@ Observação sobre auth:
 - os exemplos desta pasta mostram o padrão recomendado para o consumidor;
 - a CLI ainda gera `preHandler` explícito quando você usa `generate route --auth` ou `generate module --auth`, para manter proteção por rota mesmo quando o guard global estiver desabilitado.
 
+Observação sobre multipart:
+
+- o runtime registra `@fastify/multipart` no `createApp()` por padrão;
+- o consumidor nao precisa declarar `multipart: true`;
+- para upload por stream, use `await request.file()` ou `request.parts()` no handler;
+- `schema.consumes = ['multipart/form-data']` documenta a rota e nao habilita o parser;
+- para documentar campos do form no Swagger, inicialize a app com `createApp({ multipart: { attachFieldsToBody: true } })` e declare `schema.body`;
+- para o Swagger UI abrir o seletor de arquivo, documente o campo com `type: 'string'` e `format: 'binary'`;
+- para limites e exemplos completos de bootstrap, consulte [Multipart](./multipart.md).
+
 ## Referências relacionadas
 
 - [Arquitetura](./architecture.md)
 - [API](./api.md)
 - [OpenAPI](./openapi.md)
+- [Multipart](./multipart.md)
 - [Padrões](./standards.md)
