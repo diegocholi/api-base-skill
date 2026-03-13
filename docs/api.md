@@ -60,6 +60,8 @@ Dados e utilitários:
 - `createOwnerOnlyPolicy`
 - `createRoleOrOwnerPolicy`
 - `createScopeOrOwnerPolicy`
+- `createRolesResolver`
+- `createPermissionsResolver`
 - decorators opcionais no consumidor: `resolveRoles` e `resolvePermissions`
 - `createGoogleIdTokenVerifier`
 - `createId`

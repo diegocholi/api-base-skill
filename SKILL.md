@@ -85,6 +85,7 @@ Para auth e autorizacao contextual:
 - prefira `config.ownership` quando a regra for "owner com bypass por role e/ou permissao" e couber no contrato declarativo da rota;
 - assuma o padrao declarativo como: `roles` em `OR`, `permissions` em `AND`, `anyPermissions` em `OR` e `ownership.bypassPermissions` em `OR`;
 - considere `resolveRoles` e `resolvePermissions` como pontos de extensao opcionais do consumidor; sem eles, a validacao usa `request.user.roles` e `request.user.scopes`;
+- quando o consumidor precisar desses decorators dinamicos, prefira os helpers publicos `createRolesResolver` e `createPermissionsResolver`;
 - use `requirePolicy(...)` apenas quando a regra depender de ownership ou escopo dinamico mais rico do que `config.ownership` suporta;
 - prefira os helpers publicos `createOwnerOnlyPolicy`, `createRoleOrOwnerPolicy` e `createScopeOrOwnerPolicy` em vez de duplicar checks imperativos no handler.
 

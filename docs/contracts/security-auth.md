@@ -129,15 +129,20 @@ export async function registerSecurity(app: FastifyInstance, env: AppEnv) {
 Se houver roles/permissoes dinamicas:
 
 ```ts
-app.decorate('resolveRoles', async (request) => {
-  return loadRolesFromDb(request.user?.sub);
-});
+import { createPermissionsResolver, createRolesResolver } from '@sebrae/api-base';
 
-import { createRolePermissionsResolver } from '@/http/permissions';
+app.decorate(
+  'resolveRoles',
+  createRolesResolver({
+    cache: app.cache,
+    cacheTtlSeconds: 300,
+    loadRoles: async (userId) => loadRolesFromDb(userId),
+  }),
+);
 
 app.decorate(
   'resolvePermissions',
-  createRolePermissionsResolver({
+  createPermissionsResolver({
     cache: app.cache,
     cacheTtlSeconds: 300,
     loadPermissions: async (roles) => loadPermissionsFromDb(roles),
