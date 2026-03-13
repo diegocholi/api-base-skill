@@ -104,6 +104,8 @@ Atalhos uteis:
 - banco/repositorio: adicionar `contracts/data-db` e `contracts/data-migrations`;
 - observabilidade/auditoria: adicionar `contracts/obs-logger`, `contracts/obs-audit` e `contracts/obs-tracing-metrics`.
 
+Para decidir rapidamente qual trilha seguir antes dessa leitura minima, use [Playbooks para code agents](./agent-playbooks.md).
+
 ## Checklist operacional para code agents
 
 Antes de editar no consumidor:

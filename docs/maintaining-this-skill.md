@@ -7,13 +7,15 @@ Este guia descreve como manter a `api-base-skill` consistente e verificável nes
 Use esta ordem para evitar drift:
 
 1. `SKILL.md` define o fluxo operacional que o agente deve seguir.
-2. `docs/contracts/*` definem contratos canônicos de comportamento.
-3. `docs/examples.md` e `examples/*.ts` ilustram os contratos.
-4. `docs/testing.md` descreve como validar a skill localmente.
+2. `docs/agent-playbooks.md` consolida a tomada de decisao operacional entre os guias.
+3. `docs/contracts/*` definem contratos canônicos de comportamento.
+4. `docs/examples.md` e `examples/*.ts` ilustram os contratos.
+5. `docs/testing.md` descreve como validar a skill localmente.
 
 Se houver divergência:
 
 - preserve `SKILL.md` como contrato de navegação do agente;
+- preserve `docs/agent-playbooks.md` como ponte entre intencao da tarefa e leitura dos guias;
 - preserve `docs/contracts/*` como contrato de comportamento publicado;
 - atualize os exemplos no mesmo fluxo da mudança do contrato;
 - reduza repetição nos guias gerais e aponte para a fonte canônica.

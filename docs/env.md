@@ -4,9 +4,16 @@ Este documento lista as variáveis mais relevantes para o consumidor. A definiç
 
 Para code agents:
 
+- se a duvida inicial for qual trilha seguir, volte para [Playbooks para code agents](./agent-playbooks.md);
 - trate este arquivo como referencia de nomes e intencao das vars;
 - confirme sempre o parser real de env do consumidor antes de adicionar, remover ou renomear variaveis;
 - se o projeto tiver `src/config/env.ts`, ele prevalece sobre exemplos genericamente descritos aqui.
+
+Gatilho de retorno:
+
+- se o parser local divergir do doc, siga `src/config/env.ts`;
+- se a falha envolver bootstrap, readiness ou script ausente, volte para troubleshooting;
+- se o projeto estiver fortemente customizado ou legado, volte para o playbook de legado antes de sugerir normalizacao.
 
 ## Mínimo para desenvolvimento local
 
@@ -165,6 +172,7 @@ Limite atual intencional:
 
 ## Referências relacionadas
 
+- [Playbooks para code agents](./agent-playbooks.md)
 - [Visão geral](./overview.md)
 - [API](./api.md)
 - [OpenAPI](./openapi.md)

@@ -2,6 +2,8 @@
 
 Este guia foi escrito para diagnostico operacional no consumidor.
 
+Para uma trilha de decisao mais curta antes de abrir varios docs, comece por [Playbooks para code agents](./agent-playbooks.md).
+
 Regra geral para code agents:
 
 1. inspecione arquivos e variaveis relevantes antes de sugerir comandos;
@@ -125,6 +127,7 @@ Se precisar aprofundar:
 
 ## Referências relacionadas
 
+- [Playbooks para code agents](./agent-playbooks.md)
 - [Variáveis de ambiente](./env.md)
 - [CLI](./cli.md)
 - [Arquitetura](./architecture.md)

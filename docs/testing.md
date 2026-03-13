@@ -6,6 +6,7 @@ Este documento mistura dois contextos:
 - repositorio da base ou repositorios internos que mantem testes de documentacao.
 
 Para code agents, a regra e simples: execute apenas comandos que existirem no projeto atual.
+Se a tarefa ainda estiver ambigua entre implementacao, review ou troubleshooting, volte primeiro para [Playbooks para code agents](./agent-playbooks.md).
 
 ## Suite principal
 
@@ -86,8 +87,10 @@ Fallbacks:
 - sem suite automatizada: descreva explicitamente que a validacao foi manual;
 - sem `api-cli`: use o script equivalente do projeto, se existir;
 - sem infraestrutura local: nao finja cobertura de integracao.
+- em review, diferencie claramente entre teste nao executado e teste inexistente no projeto.
 
 ## Referências relacionadas
 
+- [Playbooks para code agents](./agent-playbooks.md)
 - [Exemplos](./examples.md)
 - [Migrações](./migrations.md)

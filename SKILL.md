@@ -38,10 +38,69 @@ A api-base e baseada em:
 - Ao alterar codigo existente, mantenha compatibilidade com a versao atual do framework usada no consumidor.
 - Ao criar novos modulos, valide naming, registro no container e hooks de lifecycle.
 - Ao alterar esta propria skill, siga `docs/maintaining-this-skill.md` e rode os checks locais antes de concluir.
+- Priorize o codigo real do consumidor quando ele divergir da documentacao generica.
+- Nao abra `docs/project-base/*` a menos que a tarefa seja manter a base, o monorepo ou a paridade entre scaffold e runtime.
+- Em review, priorize bugs, regressao comportamental, risco de compatibilidade e testes faltantes antes de sugerir ajustes esteticos.
 
-# Workflow para code agents
+# Como escolher a trilha da tarefa
 
-## 1. Descobrir contexto do consumidor
+Antes de abrir muitos arquivos, classifique a tarefa em uma destas trilhas:
+
+- criar codigo novo no scaffold atual;
+- alterar codigo existente em consumidor parcialmente legado;
+- depurar runtime, config, auth, OpenAPI, banco, cache ou filas;
+- explicar arquitetura, contratos ou fluxo de uso do framework;
+- revisar codigo existente do consumidor.
+
+Se a tarefa misturar mais de uma trilha, comece pela que reduz risco estrutural:
+
+1. diagnostico de legado ou scaffold atual;
+2. contrato tecnico relevante;
+3. implementacao ou revisao pontual.
+
+# Hierarquia de fontes
+
+Use esta ordem quando houver sobreposicao entre os guias:
+
+1. `SKILL.md` define a trilha e o comportamento esperado do agente.
+2. `docs/agent-playbooks.md` escolhe o playbook operacional por intencao ou sintoma.
+3. `docs/contracts/*` e os guias tecnicos especializados definem o contrato recomendado.
+4. o codigo real do consumidor prevalece quando houver divergencia operacional, estrutural ou de scripts.
+
+Se dois docs parecerem conflitar:
+
+- preserve a trilha do `SKILL.md`;
+- preserve o contrato tecnico do doc especializado;
+- adapte a execucao ao codigo real do consumidor;
+- registre a divergencia em vez de forcar normalizacao fora do escopo.
+
+# Sinais de scaffold atual vs legado
+
+Use estes sinais antes de decidir entre scaffold e edicao manual.
+
+## Sinais de scaffold atual
+
+- existe `src/server.ts` com `createApp<AppEnv>({ env, routesDir })` ou variacao equivalente;
+- existem wrappers como `src/http/zod.ts`, `src/config/env.ts`, `src/http/types.ts` e `src/infra/db/repo-base.ts`;
+- o `package.json` possui scripts como `dev`, `build`, `routes:validate`, `env:check` e `db:migrate`;
+- a arvore principal segue `src/http/routes`, `src/modules`, `src/infra` e `src/shared`.
+
+## Sinais de projeto legado ou divergente
+
+- imports diretos da base convivem com wrappers locais inconsistentes;
+- nao existe `src/http/zod.ts` ou o bootstrap usa padrao anterior ao scaffold atual;
+- scripts de `routes:*`, `env:*` e `db:*` estao ausentes ou com nomes totalmente locais;
+- handlers, auth ou wiring foram fortemente customizados fora dos padroes descritos em `docs/architecture.md`.
+
+## Decisao padrao
+
+- sinais majoritarios de scaffold atual: prefira CLI para gerar estrutura repetitiva;
+- sinais majoritarios de legado: preserve convencoes locais e prefira edicao manual;
+- sinal misto: gere apenas artefato isolado com dry-run mental ou leitura da CLI, mas adapte manualmente o codigo final ao padrao do consumidor.
+
+# Playbooks por cenário
+
+## Criar codigo novo no scaffold atual
 
 Antes de editar:
 
@@ -49,8 +108,7 @@ Antes de editar:
 2. Confirme se o projeto foi gerado por `init` atual ou se ainda possui scaffold legado.
 3. Localize wrappers locais como `src/http/zod.ts`, `src/config/env.ts` e `src/infra/db/repo-base.ts`.
 4. Verifique se o consumidor usa `internal`, `keycloak`, cache, filas, multipart ou migrations.
-
-## 2. Ler o minimo necessario
+5. Se o scaffold estiver atual, prefira a CLI para modulo, rota, repo, use case ou job novo.
 
 Abra nesta ordem:
 
@@ -61,16 +119,97 @@ Abra nesta ordem:
 5. `docs/examples.md`
 6. `docs/testing.md`
 
-Se a tarefa envolver auth, RBAC, ownership ou escopo por recurso, abra tambem:
+## Alterar consumidor legado ou parcialmente divergente
 
-7. `docs/contracts/security-auth.md`
+Antes de editar:
 
-Se a tarefa envolver plugin custom do consumidor, decorators locais ou bootstrap com `app.register(...)`,
-abra tambem:
+1. Compare a estrutura real com `docs/architecture.md`, mas nao tente normalizar tudo.
+2. Confirme versao, scripts reais e wrappers presentes.
+3. Identifique o padrao local dominante para rotas, env, auth e repositórios.
+4. Preserve o wiring existente e adapte so a parte necessaria para a tarefa.
 
-8. `docs/plugins.md`
+Abra nesta ordem:
 
-## 3. Escolher entre scaffold e edicao manual
+1. `docs/overview.md`
+2. `docs/architecture.md`
+3. `docs/api.md`
+4. o contrato pontual da mudanca
+5. `docs/troubleshooting.md` se houver incerteza operacional
+
+## Depurar runtime, config, auth, OpenAPI, banco, cache ou filas
+
+Antes de sugerir qualquer comando:
+
+1. confirme sintomas, arquivo de entrada e scripts reais no `package.json`;
+2. identifique se a falha e de bootstrap, rotas, auth, env, banco, cache, fila ou OpenAPI;
+3. rode o comando mais barato que ja existir no consumidor;
+4. se documentacao e codigo real divergirem, siga o codigo real e registre a divergencia.
+
+Abra nesta ordem:
+
+1. `docs/agent-playbooks.md`
+2. `docs/troubleshooting.md`
+3. `docs/api.md`
+4. o contrato tecnico correspondente ao sintoma
+
+## Explicar arquitetura ou contratos
+
+Antes de responder:
+
+1. confirme se o usuario quer visao geral, fluxo de request, bootstrap, auth, dados ou operacao;
+2. abra apenas os docs necessarios para esse recorte;
+3. use exemplos da pasta `examples/` apenas para ilustrar o contrato, nao como fonte canonica.
+
+Abra nesta ordem:
+
+1. `docs/overview.md`
+2. `docs/architecture.md`
+2. `docs/api.md`
+3. `docs/contracts/README.md`
+4. apenas os contratos relevantes para o assunto
+5. `docs/examples.md`
+
+## Revisar codigo existente do consumidor
+
+Antes de revisar:
+
+1. descubra a versao e o nivel de aderencia ao scaffold atual;
+2. identifique o contrato principal tocado pela mudanca;
+3. procure bugs, regressao de comportamento, risco de compatibilidade e falta de validacao antes de sugerir refactor estetico;
+4. use `docs/testing.md` para listar validacoes faltantes ou riscos.
+
+Abra nesta ordem:
+
+1. `docs/overview.md`
+2. `docs/api.md`
+3. o contrato central da mudanca
+4. `docs/examples.md` apenas para comparar padrao recomendado
+5. `docs/testing.md`
+
+# Roteamento rapido de leitura
+
+- auth, RBAC, ownership ou social auth: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/security-auth.md` -> `docs/examples.md`
+- plugin custom, decorators locais ou bootstrap com `app.register(...)`: adicionar `docs/plugins.md`
+- rotas HTTP novas ou ausentes: `docs/architecture.md` -> `docs/contracts/http-register-route.md` -> `docs/contracts/http-schemas-zod.md` -> `docs/examples.md`
+- banco, repo e migration: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/data-db.md` -> `docs/contracts/data-migrations.md`
+- erros HTTP, requestId, observabilidade ou auditoria: `docs/contracts/http-error-handler.md`, `docs/contracts/http-request-id.md`, `docs/contracts/obs-logger.md`, `docs/contracts/obs-audit.md`
+- diagnostico operacional: `docs/agent-playbooks.md` -> `docs/troubleshooting.md`
+
+# Quando ignorar a documentacao generica e priorizar o consumidor
+
+- o projeto usa wrappers ou adapters locais com contrato diferente do scaffold atual;
+- a CLI sugere um formato que nao combina com a estrutura real do repositorio;
+- auth, env, db ou queue foram centralizados em plugins locais nao descritos na skill;
+- os scripts documentados nao existem no `package.json`;
+- o codigo em producao depende de comportamento legado ainda suportado.
+
+Nesses casos:
+
+- preserve imports, naming e wiring locais;
+- use a documentacao apenas para validar API publica e contratos estaveis;
+- evite refactor estrutural fora do escopo pedido pelo usuario.
+
+# Decisoes de implementacao
 
 Prefira scaffold da CLI quando:
 
@@ -91,11 +230,12 @@ Para auth e autorizacao contextual:
 - prefira `config.ownership` quando a regra for "owner com bypass por role e/ou permissao" e couber no contrato declarativo da rota;
 - assuma o padrao declarativo como: `roles` em `OR`, `permissions` em `AND`, `anyPermissions` em `OR` e `ownership.bypassPermissions` em `OR`;
 - considere `resolveRoles` e `resolvePermissions` como pontos de extensao opcionais do consumidor; sem eles, a validacao usa `request.user.roles` e `request.user.scopes`;
+- para ownership e policies de owner, assuma `request.user.sub` como identificador canonico do usuario autenticado;
 - quando o consumidor precisar desses decorators dinamicos, prefira os helpers publicos `createRolesResolver` e `createPermissionsResolver`;
 - use `requirePolicy(...)` apenas quando a regra depender de ownership ou escopo dinamico mais rico do que `config.ownership` suporta;
 - prefira os helpers publicos `createOwnerOnlyPolicy`, `createRoleOrOwnerPolicy` e `createScopeOrOwnerPolicy` em vez de duplicar checks imperativos no handler.
 
-## 4. Validar depois da mudanca
+# Validar depois da mudanca
 
 No consumidor, prefira nesta ordem:
 
@@ -106,15 +246,6 @@ No consumidor, prefira nesta ordem:
 5. os checks minimos descritos em `docs/testing.md`.
 
 Se um script nao existir, nao invente outro. Procure primeiro em `package.json` e use o comando real disponivel.
-
-# Fluxo recomendado
-
-1. Identifique a versao do framework no projeto.
-2. Leia `docs/overview.md` e `docs/api.md` antes de mudancas grandes.
-3. Abra o contrato especifico da tarefa em `docs/contracts/`.
-4. Verifique exemplos reais em `examples/`.
-5. Gere ou edite codigo conforme os padroes oficiais.
-6. Valide imports, registro no container, ciclo de vida e testes minimos.
 
 # Restricoes
 
@@ -129,6 +260,7 @@ Se um script nao existir, nao invente outro. Procure primeiro em `package.json` 
 - `docs/overview.md`
 - `docs/architecture.md`
 - `docs/api.md`
+- `docs/agent-playbooks.md`
 - `docs/contracts/README.md`
 - `docs/contracts/security-auth.md`
 - `docs/plugins.md`

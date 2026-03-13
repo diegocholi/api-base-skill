@@ -1,5 +1,11 @@
 # Multipart
 
+Para code agents:
+
+- use este guia quando a decisao envolver parser multipart, `attachFieldsToBody`, upload por stream ou documentacao de arquivo no Swagger;
+- se ainda nao estiver claro se o problema e parser, OpenAPI ou wiring local, volte para [Playbooks para code agents](./agent-playbooks.md);
+- se o consumidor tiver plugin local ou shape proprio para upload, priorize o comportamento real do projeto antes de aplicar o padrao documentado aqui.
+
 ## Visao geral
 
 O runtime registra `@fastify/multipart` no `createApp()` por padrão.
@@ -24,6 +30,12 @@ Para code agents, a sequencia padrao e:
 2. usar upload por stream como padrao mais simples;
 3. habilitar `attachFieldsToBody` so quando houver requisito claro de documentacao dos campos;
 4. nao tratar `schema.body` de multipart como garantia do shape interno de `request.body`.
+
+Gatilho de retorno:
+
+- parser falha ou arquivo nao chega ao handler: volte para troubleshooting;
+- Swagger documenta mas o runtime diverge: trate `schema.body` como documental e valide o fluxo real do consumidor;
+- bootstrap muito customizado ou legado: volte para o playbook de legado.
 
 ## Configuracao do plugin
 
@@ -162,3 +174,9 @@ Checklist rapido para code agents:
 - upload com campos no Swagger: `attachFieldsToBody` + `schema.body` documental;
 - arquivo grande: evitar `toBuffer()` quando stream for suficiente;
 - validacao final: testar upload real e revisar o OpenAPI resultante.
+
+## Referências relacionadas
+
+- [Playbooks para code agents](./agent-playbooks.md)
+- [OpenAPI](./openapi.md)
+- [Exemplos](./examples.md)

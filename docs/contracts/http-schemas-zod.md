@@ -1,5 +1,11 @@
 # Schemas Zod e provedor de tipos
 
+Para code agents:
+
+- use este contrato quando a decisao principal for validacao de request/response, `defineZodRoute` ou mistura de Zod com JSON Schema;
+- se ainda nao estiver claro se o problema e de schema, OpenAPI, multipart ou legado, volte para [Playbooks para code agents](../agent-playbooks.md);
+- se o consumidor mantiver parse manual legado ou wrappers locais diferentes, preserve compatibilidade e trate este contrato como alvo recomendado, nao como refactor obrigatorio.
+
 ## Objetivo
 
 Padronizar validação de requisição/resposta com Zod e gerar tipos consistentes.
@@ -71,6 +77,11 @@ Guia rapido de escolha:
 - rota multipart com Swagger: `defineZodRoute` + JSON Schema no `body` + Zod no restante;
 - validacao fora de rota: `parseWithZod`;
 - consumidor legado com parse manual: manter compatibilidade e evitar refactor estrutural sem necessidade.
+
+Gatilho de retorno:
+
+- se a duvida principal virar Swagger ou upload, volte para `openapi` ou `multipart`;
+- se o projeto depender de parse manual legado para manter compatibilidade, fique no padrao local e evite normalizacao ampla.
 
 ## Exemplos
 

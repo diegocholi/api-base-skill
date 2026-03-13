@@ -4,6 +4,7 @@ Esta referência reúne os pontos de contato mais usados por quem consome a API-
 
 Como um code agent deve usar esta pagina:
 
+- se ainda nao estiver claro qual trilha da tarefa seguir, comece por [Playbooks para code agents](./agent-playbooks.md);
 - use esta referencia para descobrir exports, tipos e comandos validos da base;
 - nao trate esta pagina como garantia de que todo consumidor expoe todos os scripts mostrados aqui;
 - confirme sempre os scripts reais no `package.json` do consumidor antes de sugerir execucao;
@@ -147,6 +148,15 @@ Auth:
 - `GOOGLE_OAUTH_CLIENT_ID`
 - `GOOGLE_OAUTH_JWKS_URL`
 
+Contrato minimo do usuario autenticado no runtime:
+
+- `request.user.sub`
+- `request.user.roles`
+- `request.user.scopes`
+- `request.user.claims`
+
+Para detalhes de normalizacao de token, ownership e payload minimo recomendado, consulte [Autenticacao e guards](./contracts/security-auth.md).
+
 Observabilidade:
 
 - `OTEL_ENABLED`
@@ -166,8 +176,11 @@ Referência completa:
 4. rode `pnpm api-cli dev` ou o script `dev` disponivel no consumidor
 5. valide `build` e `start` usando apenas scripts que existirem no projeto real
 
+Se essa jornada nao encaixar no estado real do consumidor, volte para [Playbooks para code agents](./agent-playbooks.md) e trate o projeto como legado ou troubleshooting antes de seguir.
+
 ## Referência complementar
 
+- [Playbooks para code agents](./agent-playbooks.md)
 - [CLI](./cli.md)
 - [OpenAPI](./openapi.md)
 - [Migrações](./migrations.md)

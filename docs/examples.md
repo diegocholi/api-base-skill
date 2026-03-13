@@ -113,11 +113,13 @@ Observação sobre auth:
 - se `AUTH_GUARD_ENABLED=false`, a proteção explícita por rota continua exigindo `preHandler` chamando `request.server.requireAuth`.
 - os exemplos desta pasta mostram o padrão recomendado para o consumidor;
 - a CLI ainda gera `preHandler` explícito quando você usa `generate route --auth` ou `generate module --auth`, para manter proteção por rota mesmo quando o guard global estiver desabilitado.
+- quando o consumidor emitir JWT proprio, o objetivo e sempre chegar a um `request.user` com `sub`, `roles`, `scopes` e `claims`; veja [Autenticacao e guards](./contracts/security-auth.md).
 
 Regra adicional para code agents:
 
 - para RBAC estatico, prefira `examples/auth-protected-route-example.ts` combinado com `config.roles` e `config.permissions` descritos em [Autenticacao e guards](./contracts/security-auth.md);
 - use `preHandler` manual apenas quando a regra depender de ownership, policy customizada ou auth sem guard global;
+- ownership depende de `request.user.sub`, entao nao trate token sem `sub` como aceitavel quando a rota usa owner checks;
 - se um exemplo e o contrato divergirem, siga o contrato e ajuste o exemplo do consumidor conforme necessario.
 - os exemplos desta pasta devem permanecer alinhados com os contratos; se voce atualizar um contrato canonico, atualize o exemplo correspondente no mesmo fluxo seguindo [Manutenção da skill](./maintaining-this-skill.md).
 

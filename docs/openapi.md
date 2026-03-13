@@ -1,5 +1,11 @@
 # OpenAPI e Swagger
 
+Para code agents:
+
+- use este guia quando o problema for documentacao HTTP, Swagger UI ou `options.schema`, e nao bootstrap generico;
+- se ainda nao estiver claro se o problema e OpenAPI, runtime ou legado, volte para [Playbooks para code agents](./agent-playbooks.md);
+- se a app real nao seguir o fluxo documentado aqui, priorize o codigo do consumidor e trate este guia como referencia de contrato, nao como imposicao estrutural.
+
 ## Como habilitar
 
 ```env
@@ -23,6 +29,11 @@ Para code agents, a regra pratica e:
 2. deixe `security` automatico quando a rota estiver protegida pelo contrato padrao de auth;
 3. use `schema.security` manual apenas quando precisar sobrescrever o comportamento padrao;
 4. valide primeiro se o consumidor realmente expoe scripts de OpenAPI antes de sugerir geracao ou lint.
+
+Gatilho de retorno:
+
+- se a rota estiver correta mas o problema vier de plugin local, bootstrap custom ou script ausente, volte para troubleshooting;
+- se a estrutura do consumidor divergir fortemente do scaffold atual, volte para legado antes de insistir em ajustes de OpenAPI.
 
 ```ts
 import { z } from 'zod';
@@ -137,6 +148,7 @@ Nao assuma que todo consumidor gerado pela CLI mantem scripts de geracao estatic
 
 ## Referências relacionadas
 
+- [Playbooks para code agents](./agent-playbooks.md)
 - [Visão geral](./overview.md)
 - [Exemplos](./examples.md)
 - [Variáveis de ambiente](./env.md)

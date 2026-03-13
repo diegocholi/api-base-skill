@@ -12,6 +12,12 @@ Este documento deve ser tratado por code agents como a referencia canonica para:
 - uso de `config.roles`, `config.permissions`, `config.anyPermissions` e `config.ownership`;
 - social auth e cookies.
 
+Antes de aprofundar:
+
+- se a tarefa ainda estiver ambigua entre auth, wiring local ou troubleshooting, volte para [Playbooks para code agents](../agent-playbooks.md);
+- trate este contrato como canonico para comportamento recomendado de auth;
+- se o consumidor tiver plugin local dominante, scripts ausentes ou bootstrap divergente, priorize o codigo real antes de impor o padrao daqui.
+
 ## Regra rapida para code agents
 
 Ao editar ou gerar codigo no consumidor, siga esta ordem:
@@ -23,6 +29,11 @@ Ao editar ou gerar codigo no consumidor, siga esta ordem:
 5. Use `preHandler` manual apenas quando a regra depender de decorators especificos como `requirePolicy`, `ownerOnly` ou `roleOrOwner`, ou quando `config.ownership` nao for suficiente.
 6. Se `AUTH_GUARD_ENABLED=false`, toda rota privada sem `config.roles`/`config.permissions`/`config.anyPermissions`/`config.ownership` precisa chamar `request.server.requireAuth` manualmente.
 7. Nunca implemente auth ad-hoc dentro do handler.
+
+Gatilho de retorno:
+
+- se a regra parecer certa mas o problema estiver no bootstrap, volte para troubleshooting;
+- se auth estiver encapsulada em plugin local nao descrito aqui, volte para legado e preserve o wiring existente.
 
 Quando a regra for "owner ou role/permissao administrativa", prefira `config.ownership`.
 Use helpers standalone da API-BASE com `requirePolicy(...)` apenas quando a regra nao couber
@@ -80,6 +91,29 @@ Regras:
 - `createOwnerOnlyPolicy(paramPath)`
 - `createRoleOrOwnerPolicy(role, paramPath)`
 - `createScopeOrOwnerPolicy(scope, paramPath)`
+
+### Shape minimo de `request.user`
+
+Os helpers de auth trabalham com o usuario autenticado normalizado neste formato:
+
+```ts
+{
+  sub: string;
+  roles: string[];
+  scopes: string[];
+  claims: Record<string, unknown>;
+}
+```
+
+Regra pratica para code agents:
+
+- o token aceito pelo framework precisa resultar em `request.user.sub`;
+- `request.user.sub` e o identificador usado pelos helpers de ownership;
+- sem `sub`, ownership e policies baseadas em owner nao funcionam corretamente;
+- `roles` e `scopes` podem vir de claims diferentes, mas no runtime precisam terminar normalizados em `request.user.roles` e `request.user.scopes`;
+- `claims` preserva o payload bruto ou complementar necessario para regras mais especificas do consumidor.
+
+Quando o consumidor emitir o proprio JWT interno, trate esse shape como contrato minimo do usuario autenticado.
 
 ### Variaveis de ambiente principais
 
@@ -299,6 +333,14 @@ export default defineZodRoute({
 });
 ```
 
+> Se você quiser validar um parâmetro da URL, aí seria params, por exemplo:
+```typescript
+ownership: {
+  path: 'params.accountId',
+  bypassRoles: ['admin'],
+}
+```
+
 ### 4. Rota privada com provider `keycloak`
 
 ```ts
@@ -430,6 +472,26 @@ export default defineZodRoute({
 
 ## Claims no JWT
 
+O objetivo desta secao nao e impor um payload unico de JWT, e sim deixar claro qual shape o runtime precisa obter ao final da normalizacao para preencher `request.user`.
+
+### `sub` e identificador do usuario
+
+`request.user.sub` e o identificador canonico do usuario autenticado.
+
+Para ownership:
+
+- `config.ownership` compara o owner resolvido da request com `request.user.sub`;
+- policies como `createOwnerOnlyPolicy`, `createRoleOrOwnerPolicy` e `createScopeOrOwnerPolicy` tambem dependem desse identificador;
+- portanto, o token precisa carregar um `sub` valido ou o consumidor precisa garantir que o provider normalize esse campo antes do handler.
+
+Payload minimo recomendado:
+
+```json
+{
+  "sub": "user-1"
+}
+```
+
 ### Roles
 
 As roles sao expostas em `request.user.roles`.
@@ -490,6 +552,23 @@ Payload valido com `scope` em array:
 }
 ```
 
+Payload minimo completo recomendado para JWT interno do consumidor:
+
+```json
+{
+  "sub": "user-1",
+  "roles": ["user"],
+  "scopes": ["users:read"],
+  "claims": {}
+}
+```
+
+Notas:
+
+- `roles` e `scopes` vazios sao aceitaveis quando a rota nao depende deles;
+- `sub` nao deve ficar vazio quando houver ownership, owner policies ou auditoria associada ao usuario;
+- em OIDC/JWT, `sub` ja e o identificador padrao do usuario e deve ser preservado sempre que possivel.
+
 ## Social auth
 
 ### Contrato
@@ -497,6 +576,7 @@ Payload valido com `scope` em array:
 - O runtime registra `verifySocialIdToken` automaticamente no `createApp`.
 - A API-BASE valida apenas o `id_token`.
 - O consumidor continua responsavel por vincular usuario local, definir papel padrao e emitir o JWT interno.
+- Ao emitir esse JWT interno, preserve um `sub` estavel e normalize `roles`, `scopes` e `claims` para o shape esperado de `request.user`.
 - Provider nativo nesta versao: `google`.
 - Providers customizados devem seguir o mesmo contrato de `verifySocialIdToken`.
 
@@ -636,6 +716,7 @@ Para qualquer alteracao de auth, valide ao menos:
 - usar `preHandler` manual para regras que cabem em `config.roles`/`config.permissions`;
 - declarar `config.auth.public = true` junto com `config.roles` ou `config.permissions` esperando rota publica;
 - claims sem `sub` quando `JWT_REQUIRE_SUB` estiver ativo;
+- emitir token interno sem `sub` e esperar que ownership funcione;
 - token via cookie sem header CSRF quando `JWT_COOKIE_CSFR_HEADER` estiver configurado.
 
 ## Checklist de revisao
@@ -646,4 +727,5 @@ Para qualquer alteracao de auth, valide ao menos:
 - [ ] rotas privadas declarativas usando `config.roles` e `config.permissions`.
 - [ ] `preHandler` manual reservado para policies, ownership ou regras nao declarativas.
 - [ ] provider por rota definido quando o projeto mistura `internal` e `keycloak`.
+- [ ] token ou provider normaliza `request.user.sub`, `request.user.roles` e `request.user.scopes`.
 - [ ] testes de `401`, `403` e `200` cobrindo o fluxo principal.

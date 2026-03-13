@@ -1,6 +1,7 @@
 # Contratos publicos do template
 
 Este indice detalha contratos proximos da implementacao da base. Para a jornada de uso do consumidor, comece por [Visao geral](../overview.md) e [API](../api.md).
+Se a duvida inicial for "qual trilha seguir" e nao "qual contrato abrir", comece antes por [Playbooks para code agents](../agent-playbooks.md).
 
 Limite de escopo para code agents:
 
@@ -55,6 +56,7 @@ Atalho operacional:
 
 ## Operação
 
+- [Playbooks para code agents](../agent-playbooks.md)
 - [Variáveis de ambiente](../env.md)
 - [Workers](../workers.md)
 - [Outbox](../outbox.md)
