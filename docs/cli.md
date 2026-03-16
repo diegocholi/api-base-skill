@@ -142,6 +142,33 @@ módulo `users` e migrations de demonstração. É útil para treinamento e
 exploração do framework, mas não deve ser o ponto de partida padrão de um
 serviço real.
 
+## `migrate`
+
+```bash
+pnpm api-cli migrate [id]
+```
+
+Use este comando quando o consumidor estiver parcialmente legado, mas ainda
+próximo do scaffold oficial.
+
+Casos importantes:
+
+- normalizar scripts antigos do `package.json`;
+- remover artefatos legados em `scripts/`;
+- garantir os entrypoints locais `src/infra/queue/worker.ts` e
+  `src/infra/outbox/worker.ts` para consumidores antigos.
+
+Para filas, este passo agora é especialmente relevante antes de
+`pnpm api-cli generate job`, porque o gerador espera o worker local no formato
+atual.
+
+Quando o consumidor tiver scripts antigos como:
+
+- `pnpm exec tsx watch ./node_modules/@sebrae/api-base/dist/infra/queue/worker.js`
+- `node ./node_modules/@sebrae/api-base/dist/infra/queue/worker.js`
+
+prefira rodar `pnpm api-cli migrate` antes de continuar.
+
 ## `generate module`
 
 ```bash
@@ -243,6 +270,10 @@ pnpm api-cli generate job <queue> <job>
 ```
 
 Gera schema, processor e registro de job BullMQ para o consumidor.
+
+Pré-condição:
+
+- o scaffold atual do consumidor deve ter `src/infra/queue/worker.ts`, gerado por `pnpm api-cli init`.
 
 ## Rotas
 

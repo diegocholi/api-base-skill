@@ -68,6 +68,9 @@ const message = match(result, {
 - `repo-base-example.ts`: repositório SQL-first com `RepoBase`.
 - `cache-aside-example.ts`: uso de `request.server.cache.cacheAside(...)` em rota.
 - `queue-job-example.ts`: enfileiramento com `request.server.queue.add(...)` e `requestId`.
+- `queue-worker-entry-example.ts`: entrypoint local do consumidor para worker de fila com `startQueueWorker`.
+- `outbox-worker-entry-example.ts`: entrypoint local do consumidor para worker de outbox com `startOutboxWorker`.
+- `outbox-transaction-example.ts`: escrita transacional com `withOutboxTransaction`.
 
 Trecho principal:
 
@@ -106,6 +109,8 @@ audit(
 - Use `parse-with-zod-example.ts` quando a validação não estiver dentro de um handler HTTP.
 - Use `result-example.ts` para casos de uso que não devem lançar exceções em falhas esperadas.
 - Use `repo-base-example.ts`, `cache-aside-example.ts` e `queue-job-example.ts` como referência para acesso a infraestrutura.
+- Use `queue-worker-entry-example.ts` e `outbox-worker-entry-example.ts` ao criar os entrypoints locais gerados pelo scaffold.
+- Use `outbox-transaction-example.ts` quando o caso de uso precisar gravar domínio e registrar evento na outbox no mesmo `tx`.
 
 Observação sobre auth:
 
@@ -157,3 +162,4 @@ Politica de consistencia:
 - social auth Google: `examples/social-auth-google-example.ts`
 - validacao fora do HTTP: `examples/parse-with-zod-example.ts`
 - fila, cache e repositorio: `examples/queue-job-example.ts`, `examples/cache-aside-example.ts`, `examples/repo-base-example.ts`
+- workers locais e outbox transacional: `examples/queue-worker-entry-example.ts`, `examples/outbox-worker-entry-example.ts`, `examples/outbox-transaction-example.ts`

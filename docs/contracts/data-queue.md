@@ -60,6 +60,20 @@ queue.registerJobSchema('default', 'ping-job', pingJobSchema);
 await queue.add('default', 'ping-job', { message: 'hello' });
 ```
 
+### Entry point local do consumidor
+
+```ts
+import { startQueueWorker } from '@sebrae/api-base';
+
+export const startWorker = async () => {
+  await startQueueWorker({
+    register: async ({ queueService, logger }) => {
+      // registrar jobs locais aqui
+    },
+  });
+};
+```
+
 ### Avançado
 
 ```ts

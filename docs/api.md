@@ -63,6 +63,9 @@ Dados e utilitários:
 - `createScopeOrOwnerPolicy`
 - `createRolesResolver`
 - `createPermissionsResolver`
+- `startQueueWorker`
+- `startOutboxWorker`
+- `withOutboxTransaction`
 - decorators opcionais no consumidor: `resolveRoles` e `resolvePermissions`
 - `createGoogleIdTokenVerifier`
 - `createId`
@@ -90,6 +93,10 @@ Scaffolds:
 Operação local:
 
 - `pnpm api-cli dev`
+- `pnpm run worker:dev`
+- `pnpm run worker:start`
+- `pnpm run outbox:dev`
+- `pnpm run outbox:start`
 - `pnpm api-cli routes:list`
 - `pnpm api-cli routes:validate`
 - `pnpm api-cli env check`

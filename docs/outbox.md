@@ -49,7 +49,8 @@ pnpm api-cli db migrate
 ## Como usar
 
 1. Enfileire eventos usando `OutboxService.enqueueEvent` dentro da transação.
-2. Rode o worker de outbox separadamente.
+2. Se preferir um fluxo mais guiado, use `withOutboxTransaction(...)`.
+3. Rode o worker de outbox separadamente.
 
 Exemplo (pseudo):
 
@@ -57,6 +58,19 @@ Exemplo (pseudo):
 await db.transaction(async (tx) => {
   await repo.create(tx, payload);
   await outboxService.enqueueEvent(tx, {
+    aggregate: 'user',
+    type: 'user.created',
+    payload: { id: '123' },
+  });
+});
+```
+
+Exemplo com helper:
+
+```ts
+await withOutboxTransaction(db, outboxService, async ({ tx, enqueueEvent }) => {
+  await repo.create(tx, payload);
+  await enqueueEvent({
     aggregate: 'user',
     type: 'user.created',
     payload: { id: '123' },
@@ -75,8 +89,7 @@ await db.transaction(async (tx) => {
 - `DB_URL` ausente impede o worker de iniciar.
 - `REDIS_URL` ausente impede publicacao no queue.
 - Payloads grandes devem ser evitados.
-- O `init` não gera `src/infra/outbox/worker.ts`; se o serviço precisar de um entrypoint
-  local, ele deve ser criado no consumidor.
+- O entrypoint local recomendado do consumidor fica em `src/infra/outbox/worker.ts`.
 
 ## Ajustes recomendados
 
@@ -87,5 +100,5 @@ await db.transaction(async (tx) => {
 
 - `src/infra/outbox/outbox.repository.ts`
 - `src/infra/outbox/outbox.service.ts`
-- `node_modules/@sebrae/api-base/dist/infra/outbox/worker.js`
+- `src/infra/outbox/transaction.ts`
 - `docs/workers.md`

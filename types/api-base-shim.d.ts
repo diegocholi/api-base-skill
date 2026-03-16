@@ -50,6 +50,43 @@ declare module '@sebrae/api-base' {
     loadPermissions: (roles: readonly string[]) => Promise<string[]>;
   }): unknown;
 
+  export interface QueueWorkerRegistrationContext {
+    queueService: {
+      registerQueue(name: string): unknown;
+      registerWorker(
+        queueName: string,
+        processor: (job: { name: string; queueName: string }) => Promise<unknown>,
+      ): unknown;
+    };
+    logger: {
+      info(...args: unknown[]): void;
+      warn(...args: unknown[]): void;
+      error(...args: unknown[]): void;
+    };
+  }
+
+  export function startQueueWorker(options?: {
+    register?: (context: QueueWorkerRegistrationContext) => Promise<void> | void;
+  }): Promise<void>;
+
+  export function startOutboxWorker(options?: unknown): Promise<void>;
+
+  export function withOutboxTransaction<T>(
+    db: DbExecutor,
+    outbox: {
+      enqueueEvent: (
+        tx: DbExecutor,
+        event: import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxInsert,
+      ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
+    },
+    fn: (context: {
+      tx: DbExecutor;
+      enqueueEvent: (
+        event: import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxInsert,
+      ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
+    }) => Promise<T>,
+  ): Promise<T>;
+
   export type Result<T, E = ValidationError> =
     | { ok: true; value: T }
     | { ok: false; error: E };
@@ -86,5 +123,20 @@ declare module '@sebrae/api-base' {
       limit?: number;
       offset?: number;
     }): Promise<TRow[]>;
+  }
+}
+
+declare module '@sebrae/api-base/infra/outbox/outbox.repository' {
+  export interface OutboxInsert {
+    aggregate: string;
+    type: string;
+    payload: unknown;
+  }
+
+  export interface OutboxEvent extends OutboxInsert {
+    id: number;
+    status: string;
+    created_at: Date;
+    processed_at: Date | null;
   }
 }

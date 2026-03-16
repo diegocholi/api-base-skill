@@ -195,8 +195,9 @@ Abra nesta ordem:
 
 - auth, RBAC, ownership ou social auth: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/security-auth.md` -> `docs/examples.md`
 - plugin custom, decorators locais ou bootstrap com `app.register(...)`: adicionar `docs/plugins.md`
+- fila, jobs, worker local ou outbox worker: `docs/api.md` -> `docs/contracts/data-queue.md` -> `docs/workers.md` -> `docs/outbox.md` -> `docs/examples.md`
 - rotas HTTP novas ou ausentes: `docs/architecture.md` -> `docs/contracts/http-register-route.md` -> `docs/contracts/http-schemas-zod.md` -> `docs/examples.md`
-- banco, repo e migration: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/data-db.md` -> `docs/contracts/data-migrations.md`
+- banco, repo, migration ou escrita transacional com outbox: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/data-db.md` -> `docs/outbox.md` -> `docs/examples.md`
 - erros HTTP, requestId, observabilidade ou auditoria: `docs/contracts/http-error-handler.md`, `docs/contracts/http-request-id.md`, `docs/contracts/obs-logger.md`, `docs/contracts/obs-audit.md`
 - diagnostico operacional: `docs/agent-playbooks.md` -> `docs/troubleshooting.md`
 - `socket hang up`, timeout perto de 10 segundos ou duvida sobre limites HTTP: `docs/agent-playbooks.md` -> `docs/troubleshooting.md` -> `docs/env.md`
@@ -208,6 +209,12 @@ Abra nesta ordem:
 - auth, env, db ou queue foram centralizados em plugins locais nao descritos na skill;
 - os scripts documentados nao existem no `package.json`;
 - o codigo em producao depende de comportamento legado ainda suportado.
+
+Ao lidar com consumidor legado de filas/workers:
+
+- verifique se existem `src/infra/queue/worker.ts` e `src/infra/outbox/worker.ts`;
+- se o consumidor ainda usa scripts apontando para `node_modules/@sebrae/api-base/dist/infra/*`, prefira `pnpm api-cli migrate` antes de gerar jobs novos;
+- use `generate job` apenas depois que o scaffold local de worker estiver no formato atual.
 
 Nesses casos:
 

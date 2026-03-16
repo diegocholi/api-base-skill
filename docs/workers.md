@@ -4,6 +4,18 @@ Este guia cobre a operação de filas e outbox no projeto consumidor.
 
 ## Worker de fila
 
+O scaffold atual do consumidor gera um entrypoint local em `src/infra/queue/worker.ts`.
+Esse arquivo deve importar `startQueueWorker` da LIB e receber registros gerados pela CLI.
+
+Se o consumidor ainda estiver em formato legado, rode antes:
+
+```bash
+pnpm api-cli migrate
+```
+
+Isso garante os entrypoints locais de fila e outbox no padrão atual, em vez de
+manter scripts apontando direto para arquivos publicados em `node_modules`.
+
 Uso local:
 
 ```bash
@@ -24,11 +36,23 @@ Variáveis mínimas:
 
 ## Worker de outbox
 
-O scaffold atual do consumidor não gera um arquivo local `src/infra/outbox/worker.ts`.
-Quando o serviço usa outbox, o caminho mais comum é criar um entrypoint local que importe
-o worker publicado pela LIB, ou executar esse worker publicado diretamente.
+O scaffold atual do consumidor também gera `src/infra/outbox/worker.ts`.
+O padrão recomendado é usar esse entrypoint local, que importa `startOutboxWorker`.
 
-Execução direta do worker publicado:
+Uso local:
+
+```bash
+pnpm run outbox:dev
+```
+
+Uso com build:
+
+```bash
+pnpm run build
+pnpm run outbox:start
+```
+
+Execução direta do worker publicado continua disponível apenas como fallback:
 
 ```bash
 pnpm exec tsx ./node_modules/@sebrae/api-base/dist/infra/outbox/worker.js
@@ -39,8 +63,6 @@ ou, após build:
 ```bash
 node ./node_modules/@sebrae/api-base/dist/infra/outbox/worker.js
 ```
-
-Se o time preferir um entrypoint próprio do consumidor, ele deve ser criado manualmente.
 
 Variáveis mínimas:
 
