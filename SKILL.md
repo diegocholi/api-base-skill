@@ -27,11 +27,12 @@ A api-base e baseada em:
 - modulos declarativos em `src/modules`;
 - ciclo de vida `bootstrap -> init -> run -> shutdown`;
 - adapters para integracao externa;
-- CLI para criacao e manutencao de codigo.
+- CLI para criar a estrutura base do consumidor com `pnpm api-cli init` e manter codigo gerado.
 
 # Regras de implementacao
 
 - Sempre preserve a estrutura oficial do framework.
+- Quando a tarefa for montar a base do consumidor ou inicializar um projeto aderente ao scaffold atual, considere `pnpm api-cli init` antes de sugerir criacao manual de pastas e arquivos.
 - Prefira helpers nativos antes de criar abstracoes novas.
 - Nao invente APIs que nao existam na documentacao.
 - Ao gerar codigo, siga os padroes descritos em `docs/api.md`, `docs/contracts/README.md` e `docs/examples.md`.
@@ -94,6 +95,7 @@ Use estes sinais antes de decidir entre scaffold e edicao manual.
 
 ## Decisao padrao
 
+- repositorio vazio, bootstrap ausente ou estrutura base incompleta: prefira `pnpm api-cli init` para criar o esqueleto inicial antes de implementar codigo de dominio;
 - sinais majoritarios de scaffold atual: prefira CLI para gerar estrutura repetitiva;
 - sinais majoritarios de legado: preserve convencoes locais e prefira edicao manual;
 - sinal misto: gere apenas artefato isolado com dry-run mental ou leitura da CLI, mas adapte manualmente o codigo final ao padrao do consumidor.
@@ -105,13 +107,16 @@ Use estes sinais antes de decidir entre scaffold e edicao manual.
 Antes de editar:
 
 1. Descubra a versao usada de `@sebrae/api-base` e `@sebrae/api-base-cli` em `package.json`, lockfile ou ambos.
-2. Confirme se o projeto foi gerado por `init` atual ou se ainda possui scaffold legado.
+2. Confirme se o projeto foi gerado por `init` atual, se precisa rodar `pnpm api-cli init` para criar a base, ou se ainda possui scaffold legado.
 3. Localize wrappers locais como `src/http/zod.ts`, `src/config/env.ts` e `src/infra/db/repo-base.ts`.
 4. Verifique se o consumidor usa `internal`, `keycloak`, cache, filas, multipart ou migrations.
-5. Se o scaffold estiver atual, prefira a CLI para modulo, rota, repo, use case ou job novo.
+5. Se a base ainda nao existir, prefira `pnpm api-cli init` antes de gerar artefatos isolados.
+6. Se o scaffold estiver atual, prefira a CLI para modulo, rota, repo, use case ou job novo.
 
 Ao criar ou corrigir jobs no scaffold atual:
 
+- a CLI nao serve apenas para registrar o job: `pnpm api-cli generate job <queue> <job>` deve ser tratado como o caminho padrao para criar a estrutura inicial completa do job no consumidor;
+- essa geracao normalmente cria o processor, atualiza o wiring do worker e adiciona os contratos/public exports esperados para o scaffold atual;
 - prefira `pnpm api-cli generate job <queue> <job>` em vez de criar processor manual do zero;
 - para tipar processor e logger do job, prefira `import type { ApiBaseJob, ApiBaseLogger } from '@sebrae/api-base'`;
 - quando o payload vier de `@/shared/queue-jobs`, use `import type` para o payload se o consumidor estiver com `verbatimModuleSyntax: true`;
@@ -221,7 +226,8 @@ Ao lidar com consumidor legado de filas/workers:
 
 - verifique se existem `src/infra/queue/worker.ts` e `src/infra/outbox/worker.ts`;
 - se o consumidor ainda usa scripts apontando para `node_modules/@sebrae/api-base/dist/infra/*`, prefira `pnpm api-cli migrate` antes de gerar jobs novos;
-- use `generate job` apenas depois que o scaffold local de worker estiver no formato atual.
+- use `generate job` apenas depois que o scaffold local de worker estiver no formato atual;
+- depois que o worker estiver no formato atual, prefira a CLI para montar a estrutura inicial do job antes de editar comportamento manualmente.
 - ao revisar imports de jobs, preserve o contrato publico da base: `ApiBaseJob` e `ApiBaseLogger` de `@sebrae/api-base`, com payload local vindo de `@/shared/queue-jobs` via `import type` quando aplicavel.
 
 Nesses casos:
