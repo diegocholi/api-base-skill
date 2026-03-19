@@ -48,17 +48,17 @@ pnpm api-cli db migrate
 
 ## Como usar
 
-1. Enfileire eventos usando `OutboxService.enqueueEvent` dentro da transação.
-2. Se preferir um fluxo mais guiado, use `withOutboxTransaction(...)`.
+1. Em contexto HTTP com banco configurado, use `request.server.outbox` dentro de `withOutboxTransaction(...)`.
+2. Fora do runtime HTTP, injete qualquer writer compatível com `ApiBaseOutboxWriter`.
 3. Para eventos estaveis e conhecidos, use opcionalmente `defineOutboxEvent(...)`.
 4. Rode o worker de outbox separadamente.
 
-Exemplo (pseudo):
+Exemplo em rota/use case HTTP:
 
 ```ts
-await db.transaction(async (tx) => {
+await withOutboxTransaction(request.server.db, request.server.outbox, async ({ tx, enqueueEvent }) => {
   await repo.create(tx, payload);
-  await outboxService.enqueueEvent(tx, {
+  await enqueueEvent({
     aggregate: 'user',
     type: 'user.created',
     payload: { id: '123' },
@@ -66,7 +66,7 @@ await db.transaction(async (tx) => {
 });
 ```
 
-Exemplo com helper:
+Exemplo fora do HTTP com writer explícito:
 
 ```ts
 await withOutboxTransaction(db, outboxService, async ({ tx, enqueueEvent }) => {
@@ -137,7 +137,7 @@ await withOutboxTransaction(db, outboxService, async ({ enqueueEvent }) => {
 ## Falhas comuns
 
 - Tabela `outbox` ausente: rode `pnpm api-cli db enable-outbox` ou o script equivalente e depois `pnpm api-cli db migrate` ou o comando real de migracao do projeto.
-- `DB_URL` ausente impede o worker de iniciar.
+- `DB_URL` ausente impede `request.server.outbox` e o worker de iniciar.
 - `REDIS_URL` ausente impede publicacao no queue.
 - Payloads grandes devem ser evitados.
 - O entrypoint local recomendado do consumidor fica em `src/infra/outbox/worker.ts`.

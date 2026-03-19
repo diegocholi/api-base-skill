@@ -9,6 +9,18 @@ declare module '@sebrae/api-base' {
     schema: unknown;
   }
 
+  export interface ApiBaseOutboxWriter {
+    enqueueEvent: (
+      tx: DbExecutor,
+      event: import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxInsert,
+    ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
+    enqueueDefinedEvent?: <TPayload = unknown, TType extends string = string>(
+      tx: DbExecutor,
+      definition: ApiBaseOutboxEventDefinition<TPayload, TType>,
+      payload: TPayload,
+    ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
+  }
+
   export interface ApiBaseJobDefinition<TPayload = unknown, TName extends string = string> {
     queueName: string;
     jobName: TName;
@@ -147,12 +159,7 @@ declare module '@sebrae/api-base' {
 
   export function withOutboxTransaction<T>(
     db: DbExecutor,
-    outbox: {
-      enqueueEvent: (
-        tx: DbExecutor,
-        event: import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxInsert,
-      ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
-    },
+    outbox: ApiBaseOutboxWriter,
     fn: (context: {
       tx: DbExecutor;
       enqueueEvent: (

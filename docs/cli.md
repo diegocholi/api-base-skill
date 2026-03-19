@@ -230,6 +230,14 @@ pnpm api-cli generate outbox-event <module> <event> [--shared]
 Gera um descritor estável com `defineOutboxEvent(...)` para o fluxo declarativo
 de publish via outbox.
 
+Sem `--shared`, o módulo informado precisa existir previamente em `src/modules`.
+Fluxo recomendado no scaffold atual:
+
+```bash
+pnpm api-cli generate module orders
+pnpm api-cli generate outbox-event orders created
+```
+
 Comportamento padrão:
 
 - gera o arquivo em `src/modules/<module>/application/events/<event>.event.ts`;
@@ -313,6 +321,14 @@ Gera um repositório em `src/modules` usando `RepoBase`.
 
 ```bash
 pnpm api-cli generate job <module> <job> [--shared]
+```
+
+Sem `--shared`, o módulo informado precisa existir previamente em `src/modules`.
+Fluxo recomendado no scaffold atual:
+
+```bash
+pnpm api-cli generate module orders
+pnpm api-cli generate job orders created
 ```
 
 Gera um descritor estável com `defineJob(...)` para o fluxo declarativo de

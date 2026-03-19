@@ -1,5 +1,6 @@
 import {
   withOutboxTransaction,
+  type ApiBaseOutboxWriter,
   type DbExecutor,
 } from '@sebrae/api-base';
 import { ordersCreatedEvent } from '@/modules/orders/application/events';
@@ -8,25 +9,10 @@ interface OrdersRepository {
   create: (tx: DbExecutor, input: { id: string; total: number }) => Promise<void>;
 }
 
-interface OutboxWriter {
-  enqueueEvent: (
-    tx: DbExecutor,
-    event: { aggregate: string; type: string; payload: unknown },
-  ) => Promise<{
-    id: number;
-    aggregate: string;
-    type: string;
-    payload: unknown;
-    status: string;
-    created_at: Date;
-    processed_at: Date | null;
-  }>;
-}
-
 export const createOrder = async (
   db: DbExecutor,
   repo: OrdersRepository,
-  outbox: OutboxWriter,
+  outbox: ApiBaseOutboxWriter,
 ): Promise<{ ok: true }> =>
   withOutboxTransaction(db, outbox, async ({ tx, enqueueDefinedEvent, enqueueEvent }) => {
     await repo.create(tx, { id: 'order-1', total: 1000 });

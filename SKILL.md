@@ -129,8 +129,10 @@ Ao criar ou corrigir fluxo de outbox no scaffold atual:
 
 - trate `enqueueEvent(...)` e `withOutboxTransaction(...)` como primitives de primeira classe e preserve o caminho dinamico existente;
 - abra `docs/cli.md`, `docs/outbox.md` e `docs/workers.md` quando a tarefa envolver autoria, publicacao ou operacao de outbox;
+- no scaffold atual com banco configurado, prefira `request.server.outbox` como writer compativel com `withOutboxTransaction(...)` em handlers e use cases HTTP; nao monte `OutboxRepository` ou `OutboxService` manualmente no consumidor sem necessidade clara;
 - para eventos estaveis e conhecidos, prefira `defineOutboxEvent(...)` + `enqueueDefinedEvent(...)` ou `enqueueOutboxEvent(...)` para reduzir boilerplate e validar payload com schema;
 - quando o scaffold estiver atual, trate `pnpm api-cli generate outbox-event <module> <event>` como o caminho padrao para criar o descritor inicial do evento;
+- sem `--shared`, o generator exige que o modulo ja exista em `src/modules`; se o modulo ainda nao existe, gere-o primeiro com `pnpm api-cli generate module <module>`;
 - sem `--shared`, o generator cria o descritor em `src/modules/<module>/application/events/<event>.event.ts` e deriva `aggregate` de `<module>` e `type` como `<module>.<event>`;
 - para eventos transversais, use `pnpm api-cli generate outbox-event <module> <event> --shared`, que gera em `src/shared/outbox-events` mas preserva `<module>` como namespace logico do contrato publicado;
 - nao trate `defineOutboxEvent(...)` como equivalente a `defineJob(...)`: outbox persiste evento de dominio, job continua sendo definido separadamente quando houver consumidor de fila;
@@ -225,6 +227,7 @@ Abra nesta ordem:
 - plugin custom, decorators locais ou bootstrap com `app.register(...)`: adicionar `docs/plugins.md`
 - fila, jobs, worker local ou outbox worker: `docs/api.md` -> `docs/contracts/data-queue.md` -> `docs/workers.md` -> `docs/outbox.md` -> `docs/examples.md`
 - geracao ou revisao de descritor estavel de outbox: `docs/cli.md` -> `docs/outbox.md` -> `docs/workers.md` -> `docs/examples.md`
+- uso HTTP de outbox no scaffold atual: validar primeiro se `request.server.outbox` ja esta disponivel antes de propor wiring manual com repositorio/servico;
 - rotas HTTP novas ou ausentes: `docs/architecture.md` -> `docs/contracts/http-register-route.md` -> `docs/contracts/http-schemas-zod.md` -> `docs/examples.md`
 - banco, repo, migration ou escrita transacional com outbox: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/data-db.md` -> `docs/outbox.md` -> `docs/examples.md`
 - erros HTTP, requestId, observabilidade ou auditoria: `docs/contracts/http-error-handler.md`, `docs/contracts/http-request-id.md`, `docs/contracts/obs-logger.md`, `docs/contracts/obs-audit.md`
