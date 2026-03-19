@@ -50,7 +50,8 @@ pnpm api-cli db migrate
 
 1. Enfileire eventos usando `OutboxService.enqueueEvent` dentro da transação.
 2. Se preferir um fluxo mais guiado, use `withOutboxTransaction(...)`.
-3. Rode o worker de outbox separadamente.
+3. Para eventos estaveis e conhecidos, use opcionalmente `defineOutboxEvent(...)`.
+4. Rode o worker de outbox separadamente.
 
 Exemplo (pseudo):
 
@@ -77,6 +78,46 @@ await withOutboxTransaction(db, outboxService, async ({ tx, enqueueEvent }) => {
   });
 });
 ```
+
+Exemplo declarativo para evento estavel:
+
+```ts
+import { defineOutboxEvent, withOutboxTransaction } from '@sebrae/api-base';
+import { z } from 'zod';
+
+const orderCreatedEvent = defineOutboxEvent({
+  aggregate: 'orders',
+  type: 'orders.created',
+  schema: z.object({
+    id: z.string().min(1),
+  }),
+});
+
+await withOutboxTransaction(db, outboxService, async ({ enqueueDefinedEvent }) => {
+  await enqueueDefinedEvent(orderCreatedEvent, {
+    id: 'order-1',
+  });
+});
+```
+
+Quando `aggregate`, `type` ou payload forem dinamicos de verdade, mantenha o caminho atual:
+
+```ts
+await withOutboxTransaction(db, outboxService, async ({ enqueueEvent }) => {
+  await enqueueEvent({
+    aggregate: aggregateFromDomain,
+    type: typeFromDomain,
+    payload,
+  });
+});
+```
+
+## Relacao com filas e jobs
+
+- outbox persiste eventos de dominio dentro da transacao principal;
+- o worker de outbox continua drenando registros e publicando no queue com `aggregate`, `type` e `payload`;
+- `defineOutboxEvent(...)` nao substitui `defineJob(...)`;
+- nesta primeira entrega, a CLI ainda nao gera artefatos declarativos de outbox; se precisar desse descritor, modele manualmente no consumidor.
 
 ## Idempotência
 

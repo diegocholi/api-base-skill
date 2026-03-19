@@ -59,6 +59,8 @@ Dados e utilitários:
 - `RepoBase`
 - `sql`
 - `defineJob`
+- `defineOutboxEvent`
+- `enqueueOutboxEvent`
 - `registerJobs`
 - `createOwnerOnlyPolicy`
 - `createRoleOrOwnerPolicy`
@@ -91,6 +93,12 @@ Scaffolds:
 - `pnpm api-cli generate usecase <module> <name>`
 - `pnpm api-cli generate repo <module> <name>`
 - `pnpm api-cli generate job <queue> <job>`
+
+Observacao importante sobre outbox:
+
+- a API publica agora tambem expoe `defineOutboxEvent(...)`, `enqueueOutboxEvent(...)` e `enqueueDefinedEvent(...)` dentro de `withOutboxTransaction(...)` para eventos estaveis;
+- o caminho dinamico com `enqueueEvent(...)` continua sendo primitive de primeira classe;
+- nesta primeira entrega, a CLI nao possui generator especifico para eventos declarativos de outbox; modele esses descritores manualmente quando necessario.
 
 Operação local:
 

@@ -70,7 +70,7 @@ const message = match(result, {
 - `queue-job-example.ts`: enfileiramento com `defineJob(...)`, `request.server.queue.addJob(...)` e `requestId`.
 - `queue-worker-entry-example.ts`: entrypoint local do consumidor para worker de fila com `startQueueWorker`.
 - `outbox-worker-entry-example.ts`: entrypoint local do consumidor para worker de outbox com `startOutboxWorker`.
-- `outbox-transaction-example.ts`: escrita transacional com `withOutboxTransaction`.
+- `outbox-transaction-example.ts`: escrita transacional com `withOutboxTransaction`, combinando evento declarativo estavel e evento dinamico.
 
 Trecho principal:
 
@@ -109,6 +109,7 @@ audit(
 - Use `repo-base-example.ts`, `cache-aside-example.ts` e `queue-job-example.ts` como referência para acesso a infraestrutura.
 - Use `queue-worker-entry-example.ts` e `outbox-worker-entry-example.ts` ao criar os entrypoints locais gerados pelo scaffold.
 - Use `outbox-transaction-example.ts` quando o caso de uso precisar gravar domínio e registrar evento na outbox no mesmo `tx`.
+- Para eventos estaveis, o exemplo mostra `defineOutboxEvent(...)`; para eventos construidos em runtime, mantenha `enqueueEvent(...)`.
 
 Observação sobre auth:
 

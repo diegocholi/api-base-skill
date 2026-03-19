@@ -64,6 +64,12 @@ Prefira edicao manual quando:
 - `pnpm api-cli db enable-outbox`: cria migration opcional da outbox.
 - `pnpm api-cli db generate` / `pnpm api-cli db migrate`: wrappers para banco.
 
+Observacao importante sobre outbox:
+
+- a CLI desta fase ainda nao possui generator para `defineOutboxEvent(...)` ou descritores declarativos de outbox;
+- use a CLI para habilitar migration de outbox e manter o scaffold, mas modele eventos declarativos de outbox manualmente no consumidor;
+- nao tente reaproveitar `generate job` para representar evento de dominio persistido via outbox.
+
 ## `init`
 
 ```bash

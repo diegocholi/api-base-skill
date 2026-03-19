@@ -124,6 +124,15 @@ Ao criar ou corrigir jobs no scaffold atual:
 - quando o payload vier de `@/shared/queue-jobs`, use `import type` para o payload se o consumidor estiver com `verbatimModuleSyntax: true`;
 - nao introduza imports diretos de `pino` ou `bullmq` no codigo gerado do consumidor quando a API Base ja expuser o contrato publico equivalente.
 
+Ao criar ou corrigir fluxo de outbox no scaffold atual:
+
+- trate `enqueueEvent(...)` e `withOutboxTransaction(...)` como primitives de primeira classe e preserve o caminho dinamico existente;
+- para eventos estaveis e conhecidos, prefira `defineOutboxEvent(...)` + `enqueueDefinedEvent(...)` ou `enqueueOutboxEvent(...)` para reduzir boilerplate e validar payload com schema;
+- nao trate `defineOutboxEvent(...)` como equivalente a `defineJob(...)`: outbox persiste evento de dominio, job continua sendo definido separadamente quando houver consumidor de fila;
+- o worker de outbox continua simples e dinamico, publicando `aggregate`, `type` e `payload`; nao tente registrar processors por evento no outbox worker;
+- nesta primeira entrega, nao assuma existencia de `pnpm api-cli generate outbox-event` ou generator equivalente; se o consumidor quiser descritores de outbox, crie-os manualmente no modulo compartilhado apropriado;
+- quando a tarefa envolver outbox e jobs ao mesmo tempo, confirme se o evento persistido precisa de um job consumidor separado e mantenha as duas modelagens distintas.
+
 Abra nesta ordem:
 
 1. `docs/overview.md`

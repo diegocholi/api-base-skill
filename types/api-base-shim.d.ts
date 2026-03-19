@@ -1,4 +1,14 @@
 declare module '@sebrae/api-base' {
+  export interface ApiBaseOutboxPublishContext<TType extends string = string> {
+    aggregate: string;
+    type: TType;
+  }
+
+  export interface ApiBaseOutboxEventDefinition<TPayload = unknown, TType extends string = string>
+    extends ApiBaseOutboxPublishContext<TType> {
+    schema: unknown;
+  }
+
   export interface ApiBaseJobDefinition<TPayload = unknown, TName extends string = string> {
     queueName: string;
     jobName: TName;
@@ -89,6 +99,22 @@ declare module '@sebrae/api-base' {
     schema: unknown;
   }): ApiBaseJobDefinition<TPayload, TName>;
 
+  export function defineOutboxEvent<TPayload = unknown, TType extends string = string>(
+    definition: ApiBaseOutboxEventDefinition<TPayload, TType>,
+  ): ApiBaseOutboxEventDefinition<TPayload, TType>;
+
+  export function enqueueOutboxEvent<TPayload = unknown, TType extends string = string>(
+    writer: {
+      enqueueEvent: (
+        tx: DbExecutor,
+        event: import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxInsert,
+      ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
+    },
+    tx: DbExecutor,
+    definition: ApiBaseOutboxEventDefinition<TPayload, TType>,
+    payload: TPayload,
+  ): Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
+
   export function registerJobs(
     queueService: QueueWorkerRegistrationContext['queueService'],
     logger: ApiBaseLogger,
@@ -131,6 +157,10 @@ declare module '@sebrae/api-base' {
       tx: DbExecutor;
       enqueueEvent: (
         event: import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxInsert,
+      ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
+      enqueueDefinedEvent: <TPayload = unknown, TType extends string = string>(
+        definition: ApiBaseOutboxEventDefinition<TPayload, TType>,
+        payload: TPayload,
       ) => Promise<import('@sebrae/api-base/infra/outbox/outbox.repository').OutboxEvent>;
     }) => Promise<T>,
   ): Promise<T>;

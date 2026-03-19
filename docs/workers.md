@@ -56,6 +56,8 @@ Variáveis mínimas:
 
 O scaffold atual do consumidor também gera `src/infra/outbox/worker.ts`.
 O padrão recomendado é usar esse entrypoint local, que importa `startOutboxWorker`.
+Esse worker continua simples: ele drena a tabela `outbox` e publica no queue usando `aggregate` como fila e `type` como nome do job.
+Descritores criados com `defineOutboxEvent(...)` ajudam apenas na autoria e validacao do publish; eles nao registram processors automaticamente.
 
 Uso local:
 
@@ -95,6 +97,7 @@ Variáveis mínimas:
 - ajuste batch e intervalo conforme o volume;
 - valide Redis e banco no ambiente antes do rollout.
 - prefira agrupar jobs da mesma fila com `jobs: [...]` em vez de criar `registerWorker(...)` manual por job.
+- mantenha a modelagem de jobs e outbox separada: outbox persiste evento, worker publica, e jobs consumidores continuam sendo definidos de forma explicita.
 
 ## Referências relacionadas
 
