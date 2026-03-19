@@ -1,9 +1,15 @@
 import { z } from 'zod';
 
-import { InfrastructureError, defineZodRoute } from '@sebrae/api-base';
+import { InfrastructureError, defineJob, defineZodRoute } from '@sebrae/api-base';
 
 const bodySchema = z.object({
   userId: z.uuid(),
+});
+
+const userCreatedJob = defineJob({
+  queueName: 'events',
+  jobName: 'user.created',
+  schema: bodySchema,
 });
 
 const responseSchema = z.object({
@@ -25,9 +31,8 @@ export default defineZodRoute({
       throw new InfrastructureError('Fila não configurada');
     }
 
-    const job = await request.server.queue.add(
-      'events',
-      'user.created',
+    const job = await request.server.queue.addJob(
+      userCreatedJob,
       { userId: request.body.userId },
       {
         requestId: request.requestId,

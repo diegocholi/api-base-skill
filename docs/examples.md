@@ -67,7 +67,7 @@ const message = match(result, {
 
 - `repo-base-example.ts`: repositório SQL-first com `RepoBase`.
 - `cache-aside-example.ts`: uso de `request.server.cache.cacheAside(...)` em rota.
-- `queue-job-example.ts`: enfileiramento com `request.server.queue.add(...)` e `requestId`.
+- `queue-job-example.ts`: enfileiramento com `defineJob(...)`, `request.server.queue.addJob(...)` e `requestId`.
 - `queue-worker-entry-example.ts`: entrypoint local do consumidor para worker de fila com `startQueueWorker`.
 - `outbox-worker-entry-example.ts`: entrypoint local do consumidor para worker de outbox com `startOutboxWorker`.
 - `outbox-transaction-example.ts`: escrita transacional com `withOutboxTransaction`.
@@ -75,12 +75,10 @@ const message = match(result, {
 Trecho principal:
 
 ```ts
-const job = await request.server.queue.add(
-  'events',
-  'user.created',
-  { userId: request.body.userId },
-  { requestId: request.requestId, jobOptions: { attempts: 3 } },
-);
+const job = await request.server.queue.addJob(userCreatedJob, { userId: request.body.userId }, {
+  requestId: request.requestId,
+  jobOptions: { attempts: 3 },
+});
 ```
 
 ## Observabilidade

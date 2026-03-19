@@ -1,4 +1,10 @@
 declare module '@sebrae/api-base' {
+  export interface ApiBaseJobDefinition<TPayload = unknown, TName extends string = string> {
+    queueName: string;
+    jobName: TName;
+    schema: unknown;
+  }
+
   export interface Env {
     PORT: number;
     [key: string]: unknown;
@@ -57,24 +63,57 @@ declare module '@sebrae/api-base' {
     data: TPayload;
   };
 
+  export type ApiBaseJobProcessorContext = {
+    logger: ApiBaseLogger;
+  };
+
+  export type ApiBaseJobRegistration<TPayload = unknown> = {
+    definition: ApiBaseJobDefinition<TPayload>;
+    processor: {
+      bivarianceHack(
+        job: ApiBaseJob<TPayload>,
+        context: ApiBaseJobProcessorContext,
+      ): Promise<unknown> | unknown;
+    }['bivarianceHack'];
+  };
+
   export type ApiBaseLogger = {
     info(...args: unknown[]): void;
     warn(...args: unknown[]): void;
     error(...args: unknown[]): void;
   };
 
+  export function defineJob<TPayload = unknown, TName extends string = string>(definition: {
+    queueName: string;
+    jobName: TName;
+    schema: unknown;
+  }): ApiBaseJobDefinition<TPayload, TName>;
+
+  export function registerJobs(
+    queueService: QueueWorkerRegistrationContext['queueService'],
+    logger: ApiBaseLogger,
+    registrations: ApiBaseJobRegistration[],
+  ): void;
+
   export interface QueueWorkerRegistrationContext {
     queueService: {
       registerQueue(name: string): unknown;
+      registerJob(definition: ApiBaseJobDefinition): unknown;
       registerWorker(
         queueName: string,
         processor: (job: ApiBaseJob) => Promise<unknown>,
       ): unknown;
+      addJob(
+        definition: ApiBaseJobDefinition,
+        payload: unknown,
+        options?: { requestId?: string; jobOptions?: Record<string, unknown> },
+      ): Promise<{ id?: string | number | null }>;
     };
     logger: ApiBaseLogger;
   }
 
   export function startQueueWorker(options?: {
+    jobs?: ApiBaseJobRegistration[];
     register?: (context: QueueWorkerRegistrationContext) => Promise<void> | void;
   }): Promise<void>;
 

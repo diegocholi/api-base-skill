@@ -58,6 +58,8 @@ Dados e utilitários:
 
 - `RepoBase`
 - `sql`
+- `defineJob`
+- `registerJobs`
 - `createOwnerOnlyPolicy`
 - `createRoleOrOwnerPolicy`
 - `createScopeOrOwnerPolicy`

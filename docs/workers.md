@@ -5,12 +5,25 @@ Este guia cobre a operação de filas e outbox no projeto consumidor.
 ## Worker de fila
 
 O scaffold atual do consumidor gera um entrypoint local em `src/infra/queue/worker.ts`.
-Esse arquivo deve importar `startQueueWorker` da LIB e receber registros gerados pela CLI.
-Os jobs gerados pela CLI usam `ApiBaseJob` e `ApiBaseLogger` de `@sebrae/api-base`,
+Esse arquivo deve importar `startQueueWorker` da LIB e receber registros gerados pela CLI no formato declarativo `jobs: [...]`.
+Os jobs gerados pela CLI usam `defineJob`, `ApiBaseJob` e `ApiBaseJobProcessorContext` de `@sebrae/api-base`,
 sem exigir dependência direta de `bullmq` ou `pino` no consumidor.
 
-O `logger` entregue em `register: async ({ queueService, logger }) => { ... }`
-é o logger da própria API Base usado pelo worker, sem duplicação de instância por job.
+Formato recomendado:
+
+```ts
+await startQueueWorker({
+  jobs: [
+    {
+      definition: billingChargeJob,
+      processor: processBillingChargeJob,
+    },
+  ],
+});
+```
+
+O callback `register: async ({ queueService, logger }) => { ... }`
+continua disponivel como escape hatch avancado e caminho de transicao para consumers legados.
 
 Se o consumidor ainda estiver em formato legado, rode antes:
 
@@ -81,6 +94,7 @@ Variáveis mínimas:
 - rode workers em réplicas separadas da API;
 - ajuste batch e intervalo conforme o volume;
 - valide Redis e banco no ambiente antes do rollout.
+- prefira agrupar jobs da mesma fila com `jobs: [...]` em vez de criar `registerWorker(...)` manual por job.
 
 ## Referências relacionadas
 

@@ -271,6 +271,12 @@ pnpm api-cli generate job <queue> <job>
 
 Gera schema, processor e registro de job BullMQ para o consumidor.
 
+No scaffold atual, esse comando gera o caminho recomendado do runtime:
+
+- `defineJob(...)` em `src/shared/queue-jobs.ts`;
+- processor no arquivo do job usando `ApiBaseJob` e `ApiBaseJobProcessorContext`;
+- wiring declarativo em `src/infra/queue/worker.ts` com `startQueueWorker({ jobs: [...] })`.
+
 Pré-condição:
 
 - o scaffold atual do consumidor deve ter `src/infra/queue/worker.ts`, gerado por `pnpm api-cli init`.
@@ -278,9 +284,9 @@ Pré-condição:
 O scaffold gerado usa contratos públicos da API Base para tipos de worker/job:
 
 ```ts
-import type { ApiBaseJob, ApiBaseLogger } from '@sebrae/api-base';
+import type { ApiBaseJob, ApiBaseJobProcessorContext } from '@sebrae/api-base';
 
-import { sendEmailJobName, notificationsQueueName } from '@/shared/queue-jobs';
+import { sendEmailJob } from '@/shared/queue-jobs';
 import type { SendEmailJobPayload } from '@/shared/queue-jobs';
 ```
 
