@@ -53,6 +53,7 @@ Prefira edicao manual quando:
 - `pnpm api-cli generate usecase <module> <name>`: gera caso de uso.
 - `pnpm api-cli generate repo <module> <name>`: gera repositório com `RepoBase`.
 - `pnpm api-cli generate job <queue> <job>`: gera artefatos de job BullMQ.
+- `pnpm api-cli generate outbox-event <module> <event> [--shared]`: gera descritor estável de evento de outbox.
 - `pnpm api-cli routes:list`: lista rotas resolvidas pela árvore de pastas.
 - `pnpm api-cli routes:validate`: valida convenções da árvore de rotas.
 - `pnpm api-cli routes:prepare-build`: prepara `dist/http/routes` para cold start.
@@ -66,8 +67,9 @@ Prefira edicao manual quando:
 
 Observacao importante sobre outbox:
 
-- a CLI desta fase ainda nao possui generator para `defineOutboxEvent(...)` ou descritores declarativos de outbox;
-- use a CLI para habilitar migration de outbox e manter o scaffold, mas modele eventos declarativos de outbox manualmente no consumidor;
+- a CLI agora possui `pnpm api-cli generate outbox-event <module> <event>` para criar descritores declarativos de outbox no scaffold atual;
+- sem `--shared`, o generator cria o arquivo em `src/modules/<module>/application/events/<event>.event.ts`;
+- com `--shared`, o generator cria o arquivo em `src/shared/outbox-events`;
 - nao tente reaproveitar `generate job` para representar evento de dominio persistido via outbox.
 
 ## `init`
@@ -218,6 +220,44 @@ pnpm api-cli generate route <path> [name] [--method GET|POST|PUT|PATCH|DELETE|OP
 ```
 
 Cria uma rota em `src/http/routes` seguindo a convenção da árvore de pastas.
+
+## `generate outbox-event`
+
+```bash
+pnpm api-cli generate outbox-event <module> <event> [--shared]
+```
+
+Gera um descritor estável com `defineOutboxEvent(...)` para o fluxo declarativo
+de publish via outbox.
+
+Comportamento padrão:
+
+- gera o arquivo em `src/modules/<module>/application/events/<event>.event.ts`;
+- cria ou atualiza `src/modules/<module>/application/events/index.ts`;
+- deriva `aggregate` de `<module>`;
+- deriva `type` como `<module>.<event>`.
+
+Exemplo:
+
+```bash
+pnpm api-cli generate outbox-event orders created
+```
+
+Para eventos transversais, use `--shared`:
+
+```bash
+pnpm api-cli generate outbox-event audit logged --shared
+```
+
+Nesse modo, o arquivo vai para `src/shared/outbox-events`, mas o contrato do
+evento continua derivado dos argumentos.
+
+O generator cria apenas o descritor e o schema inicial. Ele nao:
+
+- registra processors;
+- cria jobs consumidores;
+- altera o worker de outbox;
+- substitui o caminho dinamico com `enqueueEvent(...)`.
 
 Formas de uso:
 

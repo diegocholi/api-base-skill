@@ -127,10 +127,14 @@ Ao criar ou corrigir jobs no scaffold atual:
 Ao criar ou corrigir fluxo de outbox no scaffold atual:
 
 - trate `enqueueEvent(...)` e `withOutboxTransaction(...)` como primitives de primeira classe e preserve o caminho dinamico existente;
+- abra `docs/cli.md`, `docs/outbox.md` e `docs/workers.md` quando a tarefa envolver autoria, publicacao ou operacao de outbox;
 - para eventos estaveis e conhecidos, prefira `defineOutboxEvent(...)` + `enqueueDefinedEvent(...)` ou `enqueueOutboxEvent(...)` para reduzir boilerplate e validar payload com schema;
+- quando o scaffold estiver atual, trate `pnpm api-cli generate outbox-event <module> <event>` como o caminho padrao para criar o descritor inicial do evento;
+- sem `--shared`, o generator cria o descritor em `src/modules/<module>/application/events/<event>.event.ts` e deriva `aggregate` de `<module>` e `type` como `<module>.<event>`;
+- para eventos transversais, use `pnpm api-cli generate outbox-event <module> <event> --shared`, que gera em `src/shared/outbox-events` mas preserva `<module>` como namespace logico do contrato publicado;
 - nao trate `defineOutboxEvent(...)` como equivalente a `defineJob(...)`: outbox persiste evento de dominio, job continua sendo definido separadamente quando houver consumidor de fila;
 - o worker de outbox continua simples e dinamico, publicando `aggregate`, `type` e `payload`; nao tente registrar processors por evento no outbox worker;
-- nesta primeira entrega, nao assuma existencia de `pnpm api-cli generate outbox-event` ou generator equivalente; se o consumidor quiser descritores de outbox, crie-os manualmente no modulo compartilhado apropriado;
+- o generator de outbox cria apenas descritor e schema inicial; ele nao cria worker, job consumidor nem wiring adicional de fila;
 - quando a tarefa envolver outbox e jobs ao mesmo tempo, confirme se o evento persistido precisa de um job consumidor separado e mantenha as duas modelagens distintas.
 
 Abra nesta ordem:
@@ -219,6 +223,7 @@ Abra nesta ordem:
 - auth, RBAC, ownership ou social auth: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/security-auth.md` -> `docs/examples.md`
 - plugin custom, decorators locais ou bootstrap com `app.register(...)`: adicionar `docs/plugins.md`
 - fila, jobs, worker local ou outbox worker: `docs/api.md` -> `docs/contracts/data-queue.md` -> `docs/workers.md` -> `docs/outbox.md` -> `docs/examples.md`
+- geracao ou revisao de descritor estavel de outbox: `docs/cli.md` -> `docs/outbox.md` -> `docs/workers.md` -> `docs/examples.md`
 - rotas HTTP novas ou ausentes: `docs/architecture.md` -> `docs/contracts/http-register-route.md` -> `docs/contracts/http-schemas-zod.md` -> `docs/examples.md`
 - banco, repo, migration ou escrita transacional com outbox: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/data-db.md` -> `docs/outbox.md` -> `docs/examples.md`
 - erros HTTP, requestId, observabilidade ou auditoria: `docs/contracts/http-error-handler.md`, `docs/contracts/http-request-id.md`, `docs/contracts/obs-logger.md`, `docs/contracts/obs-audit.md`
@@ -253,6 +258,7 @@ Nesses casos:
 Prefira scaffold da CLI quando:
 
 - a tarefa for criar modulo, rota, use case, repo ou job novo;
+- a tarefa for criar um descritor estavel de evento de outbox em scaffold atual;
 - o consumidor seguir a estrutura oficial do `init`;
 - a geracao reduzir trabalho mecanico sem quebrar customizacoes locais.
 

@@ -81,6 +81,15 @@ await withOutboxTransaction(db, outboxService, async ({ tx, enqueueEvent }) => {
 
 Exemplo declarativo para evento estavel:
 
+No scaffold atual, o caminho recomendado e gerar o descritor por modulo:
+
+```bash
+pnpm api-cli generate outbox-event orders created
+```
+
+Isso cria um arquivo em `src/modules/orders/application/events/created.event.ts`.
+Para eventos transversais, use `--shared`, que gera em `src/shared/outbox-events`.
+
 ```ts
 import { defineOutboxEvent, withOutboxTransaction } from '@sebrae/api-base';
 import { z } from 'zod';
@@ -117,7 +126,8 @@ await withOutboxTransaction(db, outboxService, async ({ enqueueEvent }) => {
 - outbox persiste eventos de dominio dentro da transacao principal;
 - o worker de outbox continua drenando registros e publicando no queue com `aggregate`, `type` e `payload`;
 - `defineOutboxEvent(...)` nao substitui `defineJob(...)`;
-- nesta primeira entrega, a CLI ainda nao gera artefatos declarativos de outbox; se precisar desse descritor, modele manualmente no consumidor.
+- `pnpm api-cli generate outbox-event` gera apenas o descritor e o schema inicial;
+- o consumidor ainda define jobs/processors normalmente quando precisar tratar os eventos publicados.
 
 ## Idempotência
 

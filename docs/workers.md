@@ -57,7 +57,7 @@ Variáveis mínimas:
 O scaffold atual do consumidor também gera `src/infra/outbox/worker.ts`.
 O padrão recomendado é usar esse entrypoint local, que importa `startOutboxWorker`.
 Esse worker continua simples: ele drena a tabela `outbox` e publica no queue usando `aggregate` como fila e `type` como nome do job.
-Descritores criados com `defineOutboxEvent(...)` ajudam apenas na autoria e validacao do publish; eles nao registram processors automaticamente.
+Descritores criados com `pnpm api-cli generate outbox-event <module> <event>` ou manualmente com `defineOutboxEvent(...)` ajudam apenas na autoria e validacao do publish; eles nao registram processors automaticamente.
 
 Uso local:
 

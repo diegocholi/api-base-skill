@@ -109,7 +109,7 @@ audit(
 - Use `repo-base-example.ts`, `cache-aside-example.ts` e `queue-job-example.ts` como referência para acesso a infraestrutura.
 - Use `queue-worker-entry-example.ts` e `outbox-worker-entry-example.ts` ao criar os entrypoints locais gerados pelo scaffold.
 - Use `outbox-transaction-example.ts` quando o caso de uso precisar gravar domínio e registrar evento na outbox no mesmo `tx`.
-- Para eventos estaveis, o exemplo mostra `defineOutboxEvent(...)`; para eventos construidos em runtime, mantenha `enqueueEvent(...)`.
+- Para eventos estaveis, prefira gerar o descritor com `pnpm api-cli generate outbox-event <module> <event>` e use `outbox-transaction-example.ts` como referencia de uso com `enqueueDefinedEvent(...)`; para eventos construidos em runtime, mantenha `enqueueEvent(...)`.
 
 Observação sobre auth:
 
