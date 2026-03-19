@@ -1,20 +1,7 @@
-import { defineJob, startQueueWorker } from '@sebrae/api-base';
+import { startQueueWorker } from '@sebrae/api-base';
 import type { ApiBaseJob, ApiBaseJobProcessorContext } from '@sebrae/api-base';
-import { z } from 'zod';
-
-const billingChargeJobSchema = z.object({
-  id: z.string().min(1),
-});
-
-const billingChargeJob = defineJob({
-  queueName: 'billing',
-  jobName: 'billing.charge',
-  schema: billingChargeJobSchema,
-});
-
-type BillingChargeJobPayload = {
-  id: string;
-};
+import { billingChargeJob } from '@/modules/billing/application/jobs';
+import type { BillingChargeJobPayload } from '@/modules/billing/application/jobs';
 
 const processBillingChargeJob = async (
   _job: ApiBaseJob<BillingChargeJobPayload>,

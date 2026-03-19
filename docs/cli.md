@@ -52,7 +52,7 @@ Prefira edicao manual quando:
 - `pnpm api-cli generate route <path> [name]`: gera uma rota pontual.
 - `pnpm api-cli generate usecase <module> <name>`: gera caso de uso.
 - `pnpm api-cli generate repo <module> <name>`: gera repositório com `RepoBase`.
-- `pnpm api-cli generate job <queue> <job>`: gera artefatos de job BullMQ.
+- `pnpm api-cli generate job <module> <job> [--shared]`: gera descritor estável de job.
 - `pnpm api-cli generate outbox-event <module> <event> [--shared]`: gera descritor estável de evento de outbox.
 - `pnpm api-cli routes:list`: lista rotas resolvidas pela árvore de pastas.
 - `pnpm api-cli routes:validate`: valida convenções da árvore de rotas.
@@ -312,32 +312,44 @@ Gera um repositório em `src/modules` usando `RepoBase`.
 ## `generate job`
 
 ```bash
-pnpm api-cli generate job <queue> <job>
+pnpm api-cli generate job <module> <job> [--shared]
 ```
 
-Gera schema, processor e registro de job BullMQ para o consumidor.
+Gera um descritor estável com `defineJob(...)` para o fluxo declarativo de
+publish via fila.
 
-No scaffold atual, esse comando gera o caminho recomendado do runtime:
+Comportamento padrão:
 
-- `defineJob(...)` em `src/shared/queue-jobs.ts`;
-- processor no arquivo do job usando `ApiBaseJob` e `ApiBaseJobProcessorContext`;
-- wiring declarativo em `src/infra/queue/worker.ts` com `startQueueWorker({ jobs: [...] })`.
+- gera o arquivo em `src/modules/<module>/application/jobs/<job>.job.ts`;
+- cria ou atualiza `src/modules/<module>/application/jobs/index.ts`;
+- deriva `queueName` de `<module>`;
+- deriva `jobName` como `<module>.<job>`.
 
-Pré-condição:
+Exemplo:
 
-- o scaffold atual do consumidor deve ter `src/infra/queue/worker.ts`, gerado por `pnpm api-cli init`.
-
-O scaffold gerado usa contratos públicos da API Base para tipos de worker/job:
-
-```ts
-import type { ApiBaseJob, ApiBaseJobProcessorContext } from '@sebrae/api-base';
-
-import { sendEmailJob } from '@/shared/queue-jobs';
-import type { SendEmailJobPayload } from '@/shared/queue-jobs';
+```bash
+pnpm api-cli generate job orders created
 ```
 
-Quando o consumidor estiver com `verbatimModuleSyntax: true`, os payloads de
-`@/shared/queue-jobs` devem ser importados com `import type`.
+Para jobs transversais, use `--shared`:
+
+```bash
+pnpm api-cli generate job audit reprocess --shared
+```
+
+Nesse modo, o arquivo vai para `src/shared/jobs`, mas o contrato do job continua
+derivado dos argumentos.
+
+O generator cria apenas o descritor e o schema inicial. Ele nao:
+
+- cria processor;
+- altera `src/infra/queue/worker.ts`;
+- registra wiring de worker automaticamente.
+
+O fluxo recomendado continua sendo:
+
+- usar `request.server.queue.addJob(jobDefinition, payload, options)` para publish;
+- registrar processors explicitamente no worker local com `startQueueWorker({ jobs: [...] })`.
 
 ## Rotas
 

@@ -115,13 +115,14 @@ Antes de editar:
 
 Ao criar ou corrigir jobs no scaffold atual:
 
-- a CLI nao serve apenas para registrar o job: `pnpm api-cli generate job <queue> <job>` deve ser tratado como o caminho padrao para criar a estrutura inicial completa do job no consumidor;
-- essa geracao normalmente cria `defineJob(...)` em `src/shared/queue-jobs.ts`, gera o processor e atualiza o wiring declarativo do worker;
-- prefira `pnpm api-cli generate job <queue> <job>` em vez de criar processor manual do zero;
+- abra `docs/cli.md`, `docs/contracts/data-queue.md` e `docs/workers.md` quando a tarefa envolver autoria, publicacao ou operacao de jobs;
+- quando o scaffold estiver atual, trate `pnpm api-cli generate job <module> <job>` como o caminho padrao para criar o descritor inicial do job;
+- sem `--shared`, o generator cria o descritor em `src/modules/<module>/application/jobs/<job>.job.ts` e deriva `queueName` de `<module>` e `jobName` como `<module>.<job>`;
+- para jobs transversais, use `pnpm api-cli generate job <module> <job> --shared`, que gera em `src/shared/jobs` mas preserva `<module>` como namespace logico do contrato;
+- o generator de job cria apenas descritor e schema inicial; ele nao cria processor nem altera `src/infra/queue/worker.ts`;
 - o caminho recomendado de publish e worker e `queue.addJob(jobDefinition, payload, options)` e `startQueueWorker({ jobs: [...] })`;
 - o callback `register: async ({ queueService, logger }) => { ... }` continua disponivel, mas deve ser tratado como escape hatch ou transicao para legado;
 - para tipar processor e logger do job, prefira `import type { ApiBaseJob, ApiBaseJobProcessorContext } from '@sebrae/api-base'`;
-- quando o payload vier de `@/shared/queue-jobs`, use `import type` para o payload se o consumidor estiver com `verbatimModuleSyntax: true`;
 - nao introduza imports diretos de `pino` ou `bullmq` no codigo gerado do consumidor quando a API Base ja expuser o contrato publico equivalente.
 
 Ao criar ou corrigir fluxo de outbox no scaffold atual:
@@ -242,10 +243,9 @@ Ao lidar com consumidor legado de filas/workers:
 
 - verifique se existem `src/infra/queue/worker.ts` e `src/infra/outbox/worker.ts`;
 - se o consumidor ainda usa scripts apontando para `node_modules/@sebrae/api-base/dist/infra/*`, prefira `pnpm api-cli migrate` antes de gerar jobs novos;
-- use `generate job` apenas depois que o scaffold local de worker estiver no formato atual;
-- depois que o worker estiver no formato atual, prefira a CLI para montar a estrutura inicial do job antes de editar comportamento manualmente;
+- depois que o worker estiver no formato atual, prefira a CLI para montar o descritor inicial do job antes de editar processor ou wiring manualmente;
 - se o worker ja estiver em `jobs: [...]`, adicione apenas registrations declarativas no bloco gerenciado em vez de recriar dispatch manual por `job.name`;
-- ao revisar imports de jobs, preserve o contrato publico da base: `ApiBaseJob` e `ApiBaseJobProcessorContext` de `@sebrae/api-base`, com payload local vindo de `@/shared/queue-jobs` via `import type` quando aplicavel.
+- ao revisar imports de jobs, preserve o contrato publico da base: `ApiBaseJob` e `ApiBaseJobProcessorContext` de `@sebrae/api-base`, com payload local vindo do barrel do modulo ou de `@/shared/jobs` via `import type` quando aplicavel.
 
 Nesses casos:
 

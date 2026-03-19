@@ -42,6 +42,8 @@ await queue.addJob(userCreatedJob, payload, {
 - `queuePlugin` aplica defaults: attempts=3, backoff exponencial, removeOnComplete=true.
 - jobs locais podem tipar processor e logger com `ApiBaseJob` e `ApiBaseJobProcessorContext`
   importados de `@sebrae/api-base`.
+- no scaffold atual, para contratos estaveis prefira `pnpm api-cli generate job <module> <job>`
+  e use `--shared` apenas para jobs transversais.
 - `registerJobSchema(...)`, `add(...)` e `register: async (...) => { ... }` continuam disponiveis como caminho low-level/legacy.
 
 ### Saidas
@@ -75,11 +77,11 @@ await queue.addJob(pingJob, { message: 'hello' });
 ### Entry point local do consumidor
 
 ```ts
-import { defineJob, startQueueWorker } from '@sebrae/api-base';
 import type { ApiBaseJob, ApiBaseJobProcessorContext } from '@sebrae/api-base';
+import { startQueueWorker } from '@sebrae/api-base';
 
-import { billingChargeJob } from '@/shared/queue-jobs';
-import type { BillingChargeJobPayload } from '@/shared/queue-jobs';
+import { billingChargeJob } from '@/modules/billing/application/jobs';
+import type { BillingChargeJobPayload } from '@/modules/billing/application/jobs';
 
 export const processBillingChargeJob = async (
   _job: ApiBaseJob<BillingChargeJobPayload>,
@@ -109,7 +111,8 @@ await queue.addJob(userCreatedJob, payload, {
 
 ## Como um code agent decide usar este contrato
 
-- se o consumidor ja tiver `src/shared/queue-jobs.ts`, prefira adicionar o descritor com `defineJob(...)` nesse modulo compartilhado;
+- no scaffold atual, prefira gerar descritores em `src/modules/<module>/application/jobs`;
+- use `src/shared/jobs` apenas para jobs cross-cutting;
 - se a tarefa so enfileira um job novo, prefira `queue.addJob(...)` em vez de repetir `registerJobSchema(...)` e `add(...)`;
 - se o worker local ja estiver em `jobs: [...]`, preserve esse formato e adicione apenas a registration nova;
 - nao invente worker path, bootstrap ou registry sem localizar o padrao real do consumidor;

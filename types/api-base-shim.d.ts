@@ -218,3 +218,39 @@ declare module '@sebrae/api-base/infra/outbox/outbox.repository' {
     processed_at: Date | null;
   }
 }
+
+declare module '@/modules/users/application/jobs' {
+  import type { ApiBaseJobDefinition } from '@sebrae/api-base';
+
+  export type UsersCreatedJobPayload = {
+    userId: string;
+  };
+
+  export const usersCreatedJob: ApiBaseJobDefinition<UsersCreatedJobPayload, 'users.created'>;
+}
+
+declare module '@/modules/billing/application/jobs' {
+  import type { ApiBaseJobDefinition } from '@sebrae/api-base';
+
+  export type BillingChargeJobPayload = {
+    id: string;
+  };
+
+  export const billingChargeJob: ApiBaseJobDefinition<
+    BillingChargeJobPayload,
+    'billing.charge'
+  >;
+}
+
+declare module '@/modules/orders/application/events' {
+  import type { ApiBaseOutboxEventDefinition } from '@sebrae/api-base';
+
+  export type OrdersCreatedEventPayload = {
+    id: string;
+  };
+
+  export const ordersCreatedEvent: ApiBaseOutboxEventDefinition<
+    OrdersCreatedEventPayload,
+    'orders.created'
+  >;
+}

@@ -5,9 +5,9 @@ Este guia cobre a operação de filas e outbox no projeto consumidor.
 ## Worker de fila
 
 O scaffold atual do consumidor gera um entrypoint local em `src/infra/queue/worker.ts`.
-Esse arquivo deve importar `startQueueWorker` da LIB e receber registros gerados pela CLI no formato declarativo `jobs: [...]`.
-Os jobs gerados pela CLI usam `defineJob`, `ApiBaseJob` e `ApiBaseJobProcessorContext` de `@sebrae/api-base`,
-sem exigir dependência direta de `bullmq` ou `pino` no consumidor.
+Esse arquivo deve importar `startQueueWorker` da LIB e receber registrations explicitas no formato declarativo `jobs: [...]`.
+Descritores criados com `pnpm api-cli generate job <module> <job>` ou manualmente com `defineJob(...)`
+ajudam na autoria e validacao do publish, mas nao registram processors automaticamente.
 
 Formato recomendado:
 
@@ -97,6 +97,7 @@ Variáveis mínimas:
 - ajuste batch e intervalo conforme o volume;
 - valide Redis e banco no ambiente antes do rollout.
 - prefira agrupar jobs da mesma fila com `jobs: [...]` em vez de criar `registerWorker(...)` manual por job.
+- trate `pnpm api-cli generate job <module> <job>` como generator de descritor; processor e worker seguem manuais.
 - mantenha a modelagem de jobs e outbox separada: outbox persiste evento, worker publica, e jobs consumidores continuam sendo definidos de forma explicita.
 
 ## Referências relacionadas

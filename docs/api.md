@@ -92,13 +92,14 @@ Scaffolds:
 - `pnpm api-cli generate route <path>`
 - `pnpm api-cli generate usecase <module> <name>`
 - `pnpm api-cli generate repo <module> <name>`
-- `pnpm api-cli generate job <queue> <job>`
+- `pnpm api-cli generate job <module> <job> [--shared]`
 
-Observacao importante sobre outbox:
+Observacao importante sobre filas e outbox:
 
-- a API publica agora tambem expoe `defineOutboxEvent(...)`, `enqueueOutboxEvent(...)` e `enqueueDefinedEvent(...)` dentro de `withOutboxTransaction(...)` para eventos estaveis;
+- `pnpm api-cli generate job <module> <job> [--shared]` gera apenas o descritor estavel do job;
+- `pnpm api-cli generate outbox-event <module> <event> [--shared]` gera apenas o descritor estavel do evento;
 - o caminho dinamico com `enqueueEvent(...)` continua sendo primitive de primeira classe;
-- nesta primeira entrega, a CLI nao possui generator especifico para eventos declarativos de outbox; modele esses descritores manualmente quando necessario.
+- worker de fila e worker de outbox continuam sendo configurados separadamente.
 
 Operação local:
 

@@ -1,10 +1,8 @@
 import {
-  defineOutboxEvent,
   withOutboxTransaction,
-  type ApiBaseOutboxEventDefinition,
   type DbExecutor,
 } from '@sebrae/api-base';
-import { z } from 'zod';
+import { ordersCreatedEvent } from '@/modules/orders/application/events';
 
 interface OrdersRepository {
   create: (tx: DbExecutor, input: { id: string; total: number }) => Promise<void>;
@@ -25,15 +23,6 @@ interface OutboxWriter {
   }>;
 }
 
-const orderCreatedEvent: ApiBaseOutboxEventDefinition<{ id: string }, 'orders.created'> =
-  defineOutboxEvent({
-    aggregate: 'orders',
-    type: 'orders.created',
-    schema: z.object({
-      id: z.string().min(1),
-    }),
-  });
-
 export const createOrder = async (
   db: DbExecutor,
   repo: OrdersRepository,
@@ -41,7 +30,7 @@ export const createOrder = async (
 ): Promise<{ ok: true }> =>
   withOutboxTransaction(db, outbox, async ({ tx, enqueueDefinedEvent, enqueueEvent }) => {
     await repo.create(tx, { id: 'order-1', total: 1000 });
-    await enqueueDefinedEvent(orderCreatedEvent, { id: 'order-1' });
+    await enqueueDefinedEvent(ordersCreatedEvent, { id: 'order-1' });
     await enqueueEvent({
       aggregate: 'audit',
       type: 'orders.audit.created',

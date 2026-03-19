@@ -1,15 +1,10 @@
 import { z } from 'zod';
 
-import { InfrastructureError, defineJob, defineZodRoute } from '@sebrae/api-base';
+import { InfrastructureError, defineZodRoute } from '@sebrae/api-base';
+import { usersCreatedJob } from '@/modules/users/application/jobs';
 
 const bodySchema = z.object({
   userId: z.uuid(),
-});
-
-const userCreatedJob = defineJob({
-  queueName: 'events',
-  jobName: 'user.created',
-  schema: bodySchema,
 });
 
 const responseSchema = z.object({
@@ -32,7 +27,7 @@ export default defineZodRoute({
     }
 
     const job = await request.server.queue.addJob(
-      userCreatedJob,
+      usersCreatedJob,
       { userId: request.body.userId },
       {
         requestId: request.requestId,

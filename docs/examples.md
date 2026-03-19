@@ -67,7 +67,7 @@ const message = match(result, {
 
 - `repo-base-example.ts`: repositório SQL-first com `RepoBase`.
 - `cache-aside-example.ts`: uso de `request.server.cache.cacheAside(...)` em rota.
-- `queue-job-example.ts`: enfileiramento com `defineJob(...)`, `request.server.queue.addJob(...)` e `requestId`.
+- `queue-job-example.ts`: enfileiramento com `defineJob(...)`, `request.server.queue.addJob(...)` e `requestId`; no scaffold atual, prefira gerar o descritor com `pnpm api-cli generate job <module> <job>`.
 - `queue-worker-entry-example.ts`: entrypoint local do consumidor para worker de fila com `startQueueWorker`.
 - `outbox-worker-entry-example.ts`: entrypoint local do consumidor para worker de outbox com `startOutboxWorker`.
 - `outbox-transaction-example.ts`: escrita transacional com `withOutboxTransaction`, combinando evento declarativo estavel e evento dinamico.
