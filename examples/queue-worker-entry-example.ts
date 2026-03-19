@@ -1,15 +1,5 @@
 import { startQueueWorker } from '@sebrae/api-base';
-
-interface LoggerLike {
-  info: (...args: unknown[]) => void;
-  warn: (...args: unknown[]) => void;
-  error: (...args: unknown[]) => void;
-}
-
-interface JobLike {
-  name: string;
-  queueName: string;
-}
+import type { ApiBaseJob, ApiBaseLogger } from '@sebrae/api-base';
 
 const billingChargeJobConfig = {
   queueName: 'billing',
@@ -17,8 +7,8 @@ const billingChargeJobConfig = {
 };
 
 const createBillingChargeJobProcessor =
-  (_logger: LoggerLike) =>
-  async (_job: JobLike): Promise<{ ok: true }> => ({ ok: true });
+  (_logger: Pick<ApiBaseLogger, 'info'>) =>
+  async (_job: ApiBaseJob): Promise<{ ok: true }> => ({ ok: true });
 
 export const startWorker = async (): Promise<void> => {
   await startQueueWorker({

@@ -275,6 +275,18 @@ Pré-condição:
 
 - o scaffold atual do consumidor deve ter `src/infra/queue/worker.ts`, gerado por `pnpm api-cli init`.
 
+O scaffold gerado usa contratos públicos da API Base para tipos de worker/job:
+
+```ts
+import type { ApiBaseJob, ApiBaseLogger } from '@sebrae/api-base';
+
+import { sendEmailJobName, notificationsQueueName } from '@/shared/queue-jobs';
+import type { SendEmailJobPayload } from '@/shared/queue-jobs';
+```
+
+Quando o consumidor estiver com `verbatimModuleSyntax: true`, os payloads de
+`@/shared/queue-jobs` devem ser importados com `import type`.
+
 ## Rotas
 
 ### `routes:list`

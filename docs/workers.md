@@ -6,6 +6,11 @@ Este guia cobre a operação de filas e outbox no projeto consumidor.
 
 O scaffold atual do consumidor gera um entrypoint local em `src/infra/queue/worker.ts`.
 Esse arquivo deve importar `startQueueWorker` da LIB e receber registros gerados pela CLI.
+Os jobs gerados pela CLI usam `ApiBaseJob` e `ApiBaseLogger` de `@sebrae/api-base`,
+sem exigir dependência direta de `bullmq` ou `pino` no consumidor.
+
+O `logger` entregue em `register: async ({ queueService, logger }) => { ... }`
+é o logger da própria API Base usado pelo worker, sem duplicação de instância por job.
 
 Se o consumidor ainda estiver em formato legado, rode antes:
 

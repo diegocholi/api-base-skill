@@ -50,19 +50,28 @@ declare module '@sebrae/api-base' {
     loadPermissions: (roles: readonly string[]) => Promise<string[]>;
   }): unknown;
 
+  export type ApiBaseJob<TPayload = unknown> = {
+    id?: string | number | null;
+    name: string;
+    queueName: string;
+    data: TPayload;
+  };
+
+  export type ApiBaseLogger = {
+    info(...args: unknown[]): void;
+    warn(...args: unknown[]): void;
+    error(...args: unknown[]): void;
+  };
+
   export interface QueueWorkerRegistrationContext {
     queueService: {
       registerQueue(name: string): unknown;
       registerWorker(
         queueName: string,
-        processor: (job: { name: string; queueName: string }) => Promise<unknown>,
+        processor: (job: ApiBaseJob) => Promise<unknown>,
       ): unknown;
     };
-    logger: {
-      info(...args: unknown[]): void;
-      warn(...args: unknown[]): void;
-      error(...args: unknown[]): void;
-    };
+    logger: ApiBaseLogger;
   }
 
   export function startQueueWorker(options?: {

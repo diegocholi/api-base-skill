@@ -110,6 +110,13 @@ Antes de editar:
 4. Verifique se o consumidor usa `internal`, `keycloak`, cache, filas, multipart ou migrations.
 5. Se o scaffold estiver atual, prefira a CLI para modulo, rota, repo, use case ou job novo.
 
+Ao criar ou corrigir jobs no scaffold atual:
+
+- prefira `pnpm api-cli generate job <queue> <job>` em vez de criar processor manual do zero;
+- para tipar processor e logger do job, prefira `import type { ApiBaseJob, ApiBaseLogger } from '@sebrae/api-base'`;
+- quando o payload vier de `@/shared/queue-jobs`, use `import type` para o payload se o consumidor estiver com `verbatimModuleSyntax: true`;
+- nao introduza imports diretos de `pino` ou `bullmq` no codigo gerado do consumidor quando a API Base ja expuser o contrato publico equivalente.
+
 Abra nesta ordem:
 
 1. `docs/overview.md`
@@ -215,6 +222,7 @@ Ao lidar com consumidor legado de filas/workers:
 - verifique se existem `src/infra/queue/worker.ts` e `src/infra/outbox/worker.ts`;
 - se o consumidor ainda usa scripts apontando para `node_modules/@sebrae/api-base/dist/infra/*`, prefira `pnpm api-cli migrate` antes de gerar jobs novos;
 - use `generate job` apenas depois que o scaffold local de worker estiver no formato atual.
+- ao revisar imports de jobs, preserve o contrato publico da base: `ApiBaseJob` e `ApiBaseLogger` de `@sebrae/api-base`, com payload local vindo de `@/shared/queue-jobs` via `import type` quando aplicavel.
 
 Nesses casos:
 

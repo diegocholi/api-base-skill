@@ -36,6 +36,8 @@ await queue.add('events', 'user.created', payload, {
 - `startWorker()` inicia workers padrao quando o consumidor implementa esse bootstrap.
 - `options.requestId` propaga correlacao para logs do enqueue.
 - `queuePlugin` aplica defaults: attempts=3, backoff exponencial, removeOnComplete=true.
+- jobs locais podem tipar processor e logger com `ApiBaseJob` e `ApiBaseLogger`
+  importados de `@sebrae/api-base`.
 
 ### Saidas
 
@@ -64,11 +66,29 @@ await queue.add('default', 'ping-job', { message: 'hello' });
 
 ```ts
 import { startQueueWorker } from '@sebrae/api-base';
+import type { ApiBaseJob, ApiBaseLogger } from '@sebrae/api-base';
+
+import { billingChargeJobName, billingQueueName } from '@/shared/queue-jobs';
+import type { BillingChargeJobPayload } from '@/shared/queue-jobs';
+
+const createBillingChargeJobProcessor =
+  (_logger: Pick<ApiBaseLogger, 'info'>) =>
+  async (_job: ApiBaseJob<BillingChargeJobPayload>): Promise<{ ok: true }> => ({ ok: true });
 
 export const startWorker = async () => {
   await startQueueWorker({
     register: async ({ queueService, logger }) => {
-      // registrar jobs locais aqui
+      const billingChargeProcessor = createBillingChargeJobProcessor(logger);
+
+      queueService.registerQueue(billingQueueName);
+      queueService.registerWorker(billingQueueName, async (job) => {
+        if (job.name === billingChargeJobName) {
+          return billingChargeProcessor(job);
+        }
+
+        logger.warn({ jobName: job.name, queue: job.queueName }, 'Unknown job received');
+        return { ok: false };
+      });
     },
   });
 };
