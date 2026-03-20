@@ -34,6 +34,7 @@ A api-base e baseada em:
 - Sempre preserve a estrutura oficial do framework.
 - Quando a tarefa for montar a base do consumidor ou inicializar um projeto aderente ao scaffold atual, considere `pnpm api-cli init` antes de sugerir criacao manual de pastas e arquivos.
 - Prefira helpers nativos antes de criar abstracoes novas.
+- Para chamadas HTTP a servicos externos, prefira `createHttpClient` da API-BASE como padrao; nao use `fetch`, `axios` ou cliente ad hoc sem justificativa tecnica clara no consumidor.
 - Nao invente APIs que nao existam na documentacao.
 - Ao gerar codigo, siga os padroes descritos em `docs/api.md`, `docs/contracts/README.md` e `docs/examples.md`.
 - Ao alterar codigo existente, mantenha compatibilidade com a versao atual do framework usada no consumidor.
@@ -109,9 +110,19 @@ Antes de editar:
 1. Descubra a versao usada de `@sebrae/api-base` e `@sebrae/api-base-cli` em `package.json`, lockfile ou ambos.
 2. Confirme se o projeto foi gerado por `init` atual, se precisa rodar `pnpm api-cli init` para criar a base, ou se ainda possui scaffold legado.
 3. Localize wrappers locais como `src/http/zod.ts`, `src/config/env.ts` e `src/infra/db/repo-base.ts`.
-4. Verifique se o consumidor usa `internal`, `keycloak`, cache, filas, multipart ou migrations.
+4. Verifique se o consumidor usa `internal`, `keycloak`, cache, filas, multipart, migrations ou provider HTTP local baseado em `createHttpClient`.
 5. Se a base ainda nao existir, prefira `pnpm api-cli init` antes de gerar artefatos isolados.
 6. Se o scaffold estiver atual, prefira a CLI para modulo, rota, repo, use case ou job novo.
+
+Ao integrar servicos externos no scaffold atual:
+
+- abra `docs/env.md`, `docs/contracts/http-request-id.md` e `docs/troubleshooting.md` quando a tarefa envolver chamada HTTP de saida;
+- trate `createHttpClient` como o caminho padrao para integracoes HTTP externas no consumidor;
+- se o scaffold possuir provider local como `src/providers/http-client.ts`, prefira esse wrapper; caso contrario, use o provider/export publico da API-BASE compativel com a versao instalada;
+- propague `requestId` quando o fluxo tiver contexto de request ou job rastreavel;
+- configure `timeoutMs` e retries no client ou por chamada quando o contrato externo exigir comportamento diferente do default;
+- mantenha a integracao encapsulada em client/adapter do modulo, em vez de espalhar chamadas HTTP pelo handler ou use case;
+- nao introduza `fetch`, `axios` ou outro cliente paralelo quando `createHttpClient` ja cobrir a necessidade.
 
 Ao criar ou corrigir jobs no scaffold atual:
 
@@ -228,6 +239,7 @@ Abra nesta ordem:
 - fila, jobs, worker local ou outbox worker: `docs/api.md` -> `docs/contracts/data-queue.md` -> `docs/workers.md` -> `docs/outbox.md` -> `docs/examples.md`
 - geracao ou revisao de descritor estavel de outbox: `docs/cli.md` -> `docs/outbox.md` -> `docs/workers.md` -> `docs/examples.md`
 - uso HTTP de outbox no scaffold atual: validar primeiro se `request.server.outbox` ja esta disponivel antes de propor wiring manual com repositorio/servico;
+- integracao HTTP com servicos externos: `docs/env.md` -> `docs/contracts/http-request-id.md` -> `docs/troubleshooting.md`
 - rotas HTTP novas ou ausentes: `docs/architecture.md` -> `docs/contracts/http-register-route.md` -> `docs/contracts/http-schemas-zod.md` -> `docs/examples.md`
 - banco, repo, migration ou escrita transacional com outbox: `docs/overview.md` -> `docs/api.md` -> `docs/contracts/data-db.md` -> `docs/outbox.md` -> `docs/examples.md`
 - erros HTTP, requestId, observabilidade ou auditoria: `docs/contracts/http-error-handler.md`, `docs/contracts/http-request-id.md`, `docs/contracts/obs-logger.md`, `docs/contracts/obs-audit.md`
