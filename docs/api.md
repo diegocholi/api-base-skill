@@ -78,6 +78,38 @@ Dados e utilitários:
 - `audit`
 - `nowIso`
 
+## `generateClientId`
+
+Use `generateClientId` quando o consumidor precisar de um identificador deterministico do cliente a partir de um valor base conhecido.
+
+No contrato atual da API Base, o uso documentado e suportado e com CPF:
+
+- o helper recebe uma `string` de CPF;
+- aceita CPF com ou sem mascara;
+- normaliza para somente digitos antes de gerar o ID;
+- gera sempre o mesmo ID para o mesmo CPF normalizado;
+- falha com erro quando o valor nao tiver 11 digitos.
+
+Exemplo:
+
+```ts
+import { generateClientId } from '@sebrae/api-base';
+
+const clientId = generateClientId('123.456.789-09');
+```
+
+Comportamento esperado:
+
+- `generateClientId('123.456.789-09')` e `generateClientId('12345678909')` retornam o mesmo valor;
+- o retorno e um identificador opaco e estavel para o mesmo CPF de entrada;
+- `generateClientId('123')` lanca `Error('CPF inválido')`.
+
+Observacoes de uso:
+
+- prefira persistir e trafegar o `clientId` gerado em vez do CPF bruto quando o fluxo nao precisar expor o documento;
+- nao trate o retorno como aleatorio; ele e deterministico;
+- se o consumidor precisar derivar IDs de outro identificador base, esse helper nao documenta esse contrato hoje e nao deve ser reutilizado sem alinhar o comportamento primeiro.
+
 ## Comandos principais de `@sebrae/api-base-cli`
 
 Bootstrap e manutenção:

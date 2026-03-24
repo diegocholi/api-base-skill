@@ -51,6 +51,7 @@ const app = createApp<AppEnv>({ env });
 
 - `parse-with-zod-example.ts`: use `parseWithZod` fora do fluxo HTTP.
 - `result-example.ts`: caso de uso retornando `Result` e consumo com `match`.
+- `generate-client-id-example.ts`: gera um `clientId` deterministico a partir do CPF, com ou sem mascara.
 
 Trecho principal:
 
@@ -61,6 +62,12 @@ const message = match(result, {
   ok: (value) => `created:${value.id}`,
   err: (error) => `error:${error.code}`,
 });
+```
+
+Trecho de utilitario:
+
+```ts
+const clientId = generateClientId('123.456.789-09');
 ```
 
 ## Dados, cache e fila
@@ -106,6 +113,7 @@ audit(
 - Use `register-route-example.ts`, `multipart-upload-example.ts`, `auth-protected-route-example.ts` e `auth-public-route-example.ts` como base para novas rotas.
 - Use `parse-with-zod-example.ts` quando a validação não estiver dentro de um handler HTTP.
 - Use `result-example.ts` para casos de uso que não devem lançar exceções em falhas esperadas.
+- Use `generate-client-id-example.ts` quando o consumidor precisar derivar um identificador estavel de cliente a partir do CPF.
 - Use `repo-base-example.ts`, `cache-aside-example.ts` e `queue-job-example.ts` como referência para acesso a infraestrutura.
 - Use `queue-worker-entry-example.ts` e `outbox-worker-entry-example.ts` ao criar os entrypoints locais gerados pelo scaffold.
 - Use `outbox-transaction-example.ts` quando o caso de uso precisar gravar domínio e registrar evento na outbox no mesmo `tx`.
@@ -160,5 +168,6 @@ Politica de consistencia:
 - rota privada com guard global: `examples/auth-protected-route-example.ts`
 - social auth Google: `examples/social-auth-google-example.ts`
 - validacao fora do HTTP: `examples/parse-with-zod-example.ts`
+- geracao de `clientId` deterministico a partir de CPF: `examples/generate-client-id-example.ts`
 - fila, cache e repositorio: `examples/queue-job-example.ts`, `examples/cache-aside-example.ts`, `examples/repo-base-example.ts`
 - workers locais e outbox transacional: `examples/queue-worker-entry-example.ts`, `examples/outbox-worker-entry-example.ts`, `examples/outbox-transaction-example.ts`

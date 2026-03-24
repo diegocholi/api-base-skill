@@ -66,6 +66,8 @@ declare module '@sebrae/api-base' {
 
   export const CACHE_TTL_10_MINUTES: number;
 
+  export function generateClientId(cpf: string): string;
+
   export function createScopeOrOwnerPolicy(scope: string, ownerPath: string): unknown;
 
   export function createRolesResolver(options: {
