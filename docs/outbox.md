@@ -53,6 +53,12 @@ pnpm api-cli db migrate
 3. Para eventos estaveis e conhecidos, use opcionalmente `defineOutboxEvent(...)`.
 4. Rode o worker de outbox separadamente.
 
+Para code agents:
+
+- no scaffold atual com banco configurado, prefira `request.server.outbox`; nao monte `OutboxRepository` ou `OutboxService` manualmente sem necessidade clara;
+- use `enqueueDefinedEvent(...)` ou `enqueueOutboxEvent(...)` quando o evento for estavel e conhecido;
+- mantenha `enqueueEvent(...)` quando `aggregate`, `type` ou payload forem realmente dinamicos.
+
 Exemplo em rota/use case HTTP:
 
 ```ts

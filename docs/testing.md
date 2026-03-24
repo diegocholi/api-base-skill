@@ -77,9 +77,9 @@ Ao alterar auth ou RBAC, valide pelo menos:
 ## Ordem recomendada de validacao
 
 1. procure scripts reais em `package.json`;
-2. rode validacoes baratas primeiro, como `pnpm api-cli routes:validate`;
-3. rode testes automatizados relevantes;
-4. se a app estiver em execucao, rode `health` e `ready`;
+2. rode validacoes baratas primeiro, como `pnpm api-cli routes:validate` e `pnpm api-cli env check`, quando esses comandos existirem no projeto;
+3. rode testes automatizados relevantes, como `pnpm run test` ou o subset adequado;
+4. se a app estiver em execucao, rode `pnpm api-cli health --url ...` e `pnpm api-cli ready --url ...` ou o equivalente real do projeto;
 5. complemente com checks manuais quando a mudanca tocar auth, OpenAPI ou filas.
 
 Fallbacks:

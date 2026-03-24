@@ -25,6 +25,13 @@ await startQueueWorker({
 O callback `register: async ({ queueService, logger }) => { ... }`
 continua disponivel como escape hatch avancado e caminho de transicao para consumers legados.
 
+Ao revisar imports de jobs no consumidor, preserve o contrato publico da base:
+
+- `ApiBaseJob`
+- `ApiBaseJobProcessorContext`
+
+Prefira `import type` e payloads locais vindos do barrel do modulo ou de `@/shared/jobs`, quando aplicavel.
+
 Se o consumidor ainda estiver em formato legado, rode antes:
 
 ```bash
@@ -33,6 +40,8 @@ pnpm api-cli migrate
 
 Isso garante os entrypoints locais de fila e outbox no padrão atual, em vez de
 manter scripts apontando direto para arquivos publicados em `node_modules`.
+
+Se o worker ja estiver em `jobs: [...]`, adicione registrations declarativas no bloco existente em vez de recriar dispatch manual por `job.name`.
 
 Uso local:
 
@@ -58,6 +67,8 @@ O scaffold atual do consumidor também gera `src/infra/outbox/worker.ts`.
 O padrão recomendado é usar esse entrypoint local, que importa `startOutboxWorker`.
 Esse worker continua simples: ele drena a tabela `outbox` e publica no queue usando `aggregate` como fila e `type` como nome do job.
 Descritores criados com `pnpm api-cli generate outbox-event <module> <event>` ou manualmente com `defineOutboxEvent(...)` ajudam apenas na autoria e validacao do publish; eles nao registram processors automaticamente.
+
+Quando o consumidor ainda usa scripts apontando para `node_modules/@sebrae/api-base/dist/infra/*`, trate isso como sinal de legado e prefira `pnpm api-cli migrate` antes de gerar novos jobs ou normalizar o worker.
 
 Uso local:
 

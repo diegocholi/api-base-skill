@@ -32,6 +32,8 @@ Workflow recomendado:
 4. depois da geracao, revise imports, schemas, auth, naming e wiring;
 5. finalize com `routes:validate`, testes e smoke checks relevantes.
 
+Se a base ainda nao existir ou o bootstrap estiver incompleto, prefira `pnpm api-cli init` antes de criar artefatos isolados manualmente.
+
 Prefira scaffold da CLI quando:
 
 - for criar modulo, rota, repo, use case ou job novo;
@@ -43,6 +45,8 @@ Prefira edicao manual quando:
 - a mudanca alterar fluxo de negocio ja customizado;
 - o consumidor estiver em scaffold legado ou divergente;
 - a tarefa envolver ajustes finos em auth, observabilidade, SQL ou integracoes.
+
+Se o projeto estiver em estado misto, use a CLI apenas para artefatos estritamente estruturais e adapte o resultado ao wiring local.
 
 ## Comandos principais
 

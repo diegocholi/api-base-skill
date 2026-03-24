@@ -26,6 +26,29 @@ Se um guia especializado nao encaixar no estado real do consumidor, volte para o
 Se a tarefa misturar criacao com diagnostico, comece por troubleshooting.
 Se a tarefa misturar criacao com legado, trate primeiro o projeto como legado e so depois considere scaffold da CLI.
 
+## Como reconhecer scaffold atual vs legado
+
+Sinais de scaffold atual:
+
+- existe `src/server.ts` com `createApp<AppEnv>({ env, routesDir })` ou variacao equivalente;
+- existem wrappers como `src/http/zod.ts`, `src/config/env.ts`, `src/http/types.ts` e `src/infra/db/repo-base.ts`;
+- o `package.json` possui scripts como `dev`, `build`, `routes:validate`, `env:check` e `db:migrate`;
+- a arvore principal segue `src/http/routes`, `src/modules`, `src/infra` e `src/shared`.
+
+Sinais de projeto legado ou divergente:
+
+- imports diretos da base convivem com wrappers locais inconsistentes;
+- nao existe `src/http/zod.ts` ou o bootstrap usa padrao anterior ao scaffold atual;
+- scripts de `routes:*`, `env:*` e `db:*` estao ausentes ou com nomes totalmente locais;
+- handlers, auth ou wiring foram fortemente customizados fora dos padroes descritos em `docs/architecture.md`.
+
+Regra de decisao:
+
+- repositorio vazio, bootstrap ausente ou estrutura base incompleta: prefira `pnpm api-cli init` antes de implementar dominio;
+- sinais majoritarios de scaffold atual: prefira CLI para estrutura repetitiva;
+- sinais majoritarios de legado: preserve convencoes locais e prefira edicao manual;
+- sinal misto: valide primeiro o codigo real e use a CLI apenas quando o impacto for estritamente estrutural.
+
 ## Playbook de criacao
 
 1. confirme versao de `@sebrae/api-base` e `@sebrae/api-base-cli`;
@@ -34,6 +57,18 @@ Se a tarefa misturar criacao com legado, trate primeiro o projeto como legado e 
 4. use a CLI apenas para estrutura repetitiva;
 5. revise o resultado gerado antes de concluir;
 6. valide com `routes:validate`, `env check`, testes e smoke checks reais do consumidor.
+
+Ao criar no scaffold atual:
+
+- para integracao HTTP, siga `docs/env.md`, `docs/contracts/http-request-id.md` e `docs/troubleshooting.md`;
+- para jobs, siga `docs/cli.md`, `docs/contracts/data-queue.md` e `docs/workers.md`;
+- para outbox, siga `docs/cli.md`, `docs/outbox.md` e `docs/workers.md`;
+- para auth declarativa ou contextual, siga `docs/contracts/security-auth.md`.
+
+Regra de escolha entre CLI e edicao manual:
+
+- prefira CLI quando a mudanca for majoritariamente estrutural, o scaffold seguir o `init` atual e a geracao reduzir trabalho mecanico;
+- prefira edicao manual quando a mudanca alterar comportamento de codigo customizado, regras de negocio, auth, observabilidade ou integracoes especificas.
 
 ## Playbook de legado
 
@@ -51,6 +86,11 @@ Se a tarefa misturar criacao com legado, trate primeiro o projeto como legado e 
 4. abra `docs/troubleshooting.md` e o contrato tecnico da categoria;
 5. se o erro vier de wiring local, priorize o codigo real do consumidor;
 6. encerre com a menor validacao que prove o diagnostico.
+
+Atalho importante para timeout:
+
+- se o sintoma mencionar `socket hang up`, timeout perto de 10 segundos ou request longa encerrada pela API, revise primeiro `docs/troubleshooting.md` e `docs/env.md`;
+- confirme se a falha acontece na request que entra no consumidor ou na chamada que o consumidor faz para uma API externa antes de propor ajuste.
 
 ## Playbook de explicacao
 
@@ -74,6 +114,7 @@ Se a tarefa misturar criacao com legado, trate primeiro o projeto como legado e 
 - erro HTTP fora do contrato: `docs/troubleshooting.md` + `docs/contracts/http-error-handler.md`
 - banco, cache ou fila: `docs/troubleshooting.md` + contratos de dados relevantes
 - `socket hang up`, timeout perto de 10 segundos ou duvida entre timeout de entrada e saida: `docs/troubleshooting.md` + `docs/env.md`
+- validacao depois da mudanca: `docs/testing.md`
 
 ## Regras de fallback
 

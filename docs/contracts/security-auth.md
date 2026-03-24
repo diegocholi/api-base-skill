@@ -112,6 +112,18 @@ Regra pratica para code agents:
 - sem `sub`, ownership e policies baseadas em owner nao funcionam corretamente;
 - `roles` e `scopes` podem vir de claims diferentes, mas no runtime precisam terminar normalizados em `request.user.roles` e `request.user.scopes`;
 - `claims` preserva o payload bruto ou complementar necessario para regras mais especificas do consumidor.
+- para campos padrao, use `request.user.sub`, `request.user.roles` e `request.user.scopes`;
+- para claims arbitrarias do token que nao forem normalizadas pelo framework, como `preferred_username`, `email` ou `name`, leia `request.user.claims.<claim>`;
+- nao assuma que uma claim do IdP foi promovida para `request.user.<claim>` sem evidencia no codigo real do consumidor.
+
+Exemplo de leitura de claim nao normalizada:
+
+```ts
+const preferredUsername =
+  typeof request.user?.claims.preferred_username === 'string'
+    ? request.user.claims.preferred_username
+    : undefined;
+```
 
 Quando o consumidor emitir o proprio JWT interno, trate esse shape como contrato minimo do usuario autenticado.
 
