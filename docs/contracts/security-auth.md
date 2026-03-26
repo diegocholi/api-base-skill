@@ -710,6 +710,36 @@ Comportamento:
 - `JWT_COOKIE_SAME_SITE=none` exige `JWT_COOKIE_SECURE=true`;
 - os helpers preservam outros headers `Set-Cookie` ja existentes.
 
+## Emissao de JWT interno
+
+Quando o consumidor precisar gerar um JWT interno para testes, login local ou troca controlada de
+credenciais, o caminho esperado e `reply.jwtSign(...)`.
+
+Exemplo:
+
+```ts
+const token = await reply.jwtSign({
+  sub: 'user-1',
+  roles: ['admin'],
+  permissions: ['users:read'],
+});
+```
+
+Regras:
+
+- `reply.jwtSign(...)` depende do `jwtAuthPlugin` registrado no bootstrap;
+- sem `sub`, o token pode ser rejeitado quando `JWT_REQUIRE_SUB=true`;
+- `roles` alimenta `request.user.roles`;
+- `permissions` e uma claim aceita pelo runtime e sera normalizada em `request.user.scopes`;
+- use `reply.issueAuthCookies(...)` apenas para transportar um token ja emitido em cookie;
+- nao use cookies como substituto da emissao do token em si.
+
+Contrato de tipos para consumidores:
+
+- quem importa `@sebrae/api-base/http/fastify-context` deve receber tanto os augmentations locais
+  de Fastify quanto os decorators expostos por `@fastify/jwt`;
+- isso inclui `reply.jwtSign(...)`, alem de helpers como `reply.issueAuthCookies(...)`.
+
 ## Testes minimos que um code agent deve validar
 
 Para qualquer alteracao de auth, valide ao menos:
@@ -718,6 +748,7 @@ Para qualquer alteracao de auth, valide ao menos:
 - token invalido: `401`;
 - token valido sem role/permissao necessaria: `403`;
 - token valido com role/permissao necessaria: `200`;
+- emissao de JWT interno usa `reply.jwtSign(...)` quando o consumidor precisa gerar tokens.
 - rota publica: `200` sem token;
 - rota com decorator esperado ausente: `503`.
 

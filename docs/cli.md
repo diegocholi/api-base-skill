@@ -138,6 +138,12 @@ Esses arquivos padronizam o uso de `@/` no consumidor e deixam espaço para
 customização futura sem refatorar todos os imports. Se o projeto preferir,
 também é possível importar diretamente de `@sebrae/api-base`.
 
+Observacao sobre `src/http/fastify-context.d.ts`:
+
+- este arquivo deve carregar `@sebrae/api-base/http/fastify-context`;
+- ao fazer isso, o consumidor deve enxergar tanto os augmentations locais de Fastify quanto os
+  decorators tipados vindos de `@fastify/jwt`, incluindo `reply.jwtSign(...)`.
+
 ### Quando usar cada modo
 
 - `init`: para projeto consumidor novo, sem domínio de exemplo.
