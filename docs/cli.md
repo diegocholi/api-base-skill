@@ -126,6 +126,43 @@ No padrão atual, o scaffold já assume que o consumidor pode ter envs próprias
 Isso reduz a necessidade de casts ou adapters por rota quando o projeto adiciona
 variáveis próprias além das fornecidas pela `API-BASE`.
 
+Quando o consumidor adicionar decorators próprios, o padrão recomendado passa a ter dois pontos:
+
+1. `src/http/fastify-context.d.ts` declara a augmentation de `FastifyInstance`;
+2. `src/http/types.ts` reflete os decorators locais nos aliases que o projeto usar diretamente.
+
+Exemplo:
+
+```ts
+// src/http/fastify-context.d.ts
+import '@sebrae/api-base/http/fastify-context';
+import type { Client as MinioClient } from 'minio';
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    minio: MinioClient;
+  }
+}
+
+export {};
+```
+
+```ts
+// src/http/types.ts
+import type { ApiBaseApp, ApiBaseFastifyInstance, ApiBaseFastifyRequest } from '@sebrae/api-base';
+import type { Client as MinioClient } from 'minio';
+
+import type { AppEnv } from '@/config/env';
+
+export type App = ApiBaseApp<AppEnv>;
+export type AppFastifyInstance = ApiBaseFastifyInstance<AppEnv> & {
+  minio: MinioClient;
+};
+export type AppFastifyRequest<
+  TRouteGeneric extends Record<string, unknown> = Record<string, unknown>,
+> = ApiBaseFastifyRequest<TRouteGeneric, AppEnv>;
+```
+
 Alguns wrappers gerados são "pass-through" para exports públicos da lib, como:
 
 - `@/http/route.types`
@@ -145,6 +182,7 @@ Observacao sobre `src/http/fastify-context.d.ts`:
   decorators tipados vindos de `@fastify/jwt`, incluindo `reply.jwtSign(...)`.
 - decorators customizados do consumidor devem ser declarados via `declare module 'fastify' { interface FastifyInstance { ... } }`;
 - quando isso for feito nesse arquivo, `request.server.<decorator>` deve aparecer tipado nas rotas sem cast manual.
+- se o consumidor usar `AppFastifyInstance` diretamente, esse alias local tambem deve refletir o decorator.
 
 ### Quando usar cada modo
 

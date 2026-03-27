@@ -35,6 +35,21 @@ Para decorators customizados do consumidor:
 - importe `@sebrae/api-base/http/fastify-context` nesse arquivo `.d.ts`;
 - use o decorator diretamente em `request.server.<decorator>` nas rotas;
 - não faça cast manual por rota quando a augmentation estiver correta.
+- se o consumidor usar aliases locais como `AppFastifyInstance`, reflita o decorator nesse alias tambem.
+
+Exemplo:
+
+```ts
+// src/http/types.ts
+import type { ApiBaseFastifyInstance } from '@sebrae/api-base';
+import type { Client as MinioClient } from 'minio';
+
+import type { AppEnv } from '@/config/env';
+
+export type AppFastifyInstance = ApiBaseFastifyInstance<AppEnv> & {
+  minio: MinioClient;
+};
+```
 
 Para RBAC dinâmico, prefira os helpers públicos:
 
