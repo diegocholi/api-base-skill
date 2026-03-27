@@ -143,6 +143,8 @@ Observacao sobre `src/http/fastify-context.d.ts`:
 - este arquivo deve carregar `@sebrae/api-base/http/fastify-context`;
 - ao fazer isso, o consumidor deve enxergar tanto os augmentations locais de Fastify quanto os
   decorators tipados vindos de `@fastify/jwt`, incluindo `reply.jwtSign(...)`.
+- decorators customizados do consumidor devem ser declarados via `declare module 'fastify' { interface FastifyInstance { ... } }`;
+- quando isso for feito nesse arquivo, `request.server.<decorator>` deve aparecer tipado nas rotas sem cast manual.
 
 ### Quando usar cada modo
 

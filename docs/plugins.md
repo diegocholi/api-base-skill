@@ -28,6 +28,14 @@ const app = createApp({ env, routesDir: resolveRoutesDir() });
 await app.register(authRbacPlugin, { env });
 ```
 
+Para decorators customizados do consumidor:
+
+- registre o decorator no plugin com `app.decorate(...)`;
+- declare a extensão de `FastifyInstance` em `src/http/fastify-context.d.ts`;
+- importe `@sebrae/api-base/http/fastify-context` nesse arquivo `.d.ts`;
+- use o decorator diretamente em `request.server.<decorator>` nas rotas;
+- não faça cast manual por rota quando a augmentation estiver correta.
+
 Para RBAC dinâmico, prefira os helpers públicos:
 
 - `createRolesResolver`
