@@ -90,6 +90,7 @@ Regra de escolha entre CLI e edicao manual:
 Atalho importante para timeout:
 
 - se o sintoma mencionar `socket hang up`, timeout perto de 10 segundos ou request longa encerrada pela API, revise primeiro `docs/troubleshooting.md` e `docs/env.md`;
+- se o sintoma mencionar worker BullMQ, job atrasado, delay maior que 10 segundos, PIX em minutos ou boleto em horas, revise primeiro `docs/contracts/data-queue.md` e `docs/workers.md`;
 - confirme se a falha acontece na request que entra no consumidor ou na chamada que o consumidor faz para uma API externa antes de propor ajuste.
 
 ## Playbook de explicacao
@@ -113,6 +114,7 @@ Atalho importante para timeout:
 - OpenAPI incompleto: `docs/troubleshooting.md` + `docs/openapi.md` + `docs/contracts/http-schemas-zod.md`
 - erro HTTP fora do contrato: `docs/troubleshooting.md` + `docs/contracts/http-error-handler.md`
 - banco, cache ou fila: `docs/troubleshooting.md` + contratos de dados relevantes
+- job agendado/reagendavel ou timeout no worker BullMQ: `docs/contracts/data-queue.md` + `docs/workers.md`
 - `socket hang up`, timeout perto de 10 segundos ou duvida entre timeout de entrada e saida: `docs/troubleshooting.md` + `docs/env.md`
 - validacao depois da mudanca: `docs/testing.md`
 

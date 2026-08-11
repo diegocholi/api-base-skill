@@ -98,6 +98,7 @@ Nao replique playbooks completos na raiz. Use `docs/agent-playbooks.md` como des
 - auth, RBAC, ownership ou social auth: `docs/agent-playbooks.md` -> `docs/contracts/security-auth.md`
 - integracao HTTP com servicos externos e timeouts: `docs/agent-playbooks.md` -> `docs/troubleshooting.md` -> `docs/env.md` -> `docs/contracts/http-request-id.md`
 - jobs, workers e filas: `docs/agent-playbooks.md` -> `docs/cli.md` -> `docs/contracts/data-queue.md` -> `docs/workers.md`
+- jobs agendados/reagendaveis, debounce por entidade ou timeout de job atrasado: `docs/contracts/data-queue.md` -> `docs/workers.md`
 - outbox e escrita transacional: `docs/agent-playbooks.md` -> `docs/outbox.md` -> `docs/workers.md` -> `docs/contracts/data-db.md`
 - rotas HTTP e schemas: `docs/agent-playbooks.md` -> `docs/contracts/http-register-route.md` -> `docs/contracts/http-schemas-zod.md` -> `docs/examples.md`
 - erros HTTP, requestId, observabilidade ou auditoria: `docs/agent-playbooks.md` -> contratos especializados correspondentes

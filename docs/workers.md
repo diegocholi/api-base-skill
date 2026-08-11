@@ -61,6 +61,11 @@ Variáveis mínimas:
 - `REDIS_URL`
 - `QUEUE_PREFIX` opcional
 
+A conexao Redis usada pelo worker e duplicada internamente pela LIB e nao reutiliza a conexao
+de cache/API. Essa conexao desabilita `commandTimeout` porque o BullMQ mantem comandos
+bloqueantes aguardando jobs atrasados, por exemplo PIX em 5 minutos ou boleto em 1 hora, e e
+fechada no shutdown do worker.
+
 ## Worker de outbox
 
 O scaffold atual do consumidor também gera `src/infra/outbox/worker.ts`.

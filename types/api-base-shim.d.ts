@@ -251,6 +251,17 @@ declare module '@/modules/billing/application/jobs' {
   >;
 }
 
+declare module '@/modules/payments/application/jobs' {
+  import type { ApiBaseJobDefinition } from '@sebrae/api-base';
+
+  export type PaymentJobPayload = {
+    paymentId: string;
+    method: 'pix' | 'boleto';
+  };
+
+  export const paymentJob: ApiBaseJobDefinition<PaymentJobPayload, 'payments.process'>;
+}
+
 declare module '@/modules/orders/application/events' {
   import type { ApiBaseOutboxEventDefinition } from '@sebrae/api-base';
 

@@ -75,6 +75,7 @@ const clientId = generateClientId('123.456.789-09');
 - `repo-base-example.ts`: repositório SQL-first com `RepoBase`.
 - `cache-aside-example.ts`: uso de `request.server.cache.cacheAside(...)` em rota.
 - `queue-job-example.ts`: enfileiramento com `defineJob(...)`, `request.server.queue.addJob(...)` e `requestId`; no scaffold atual, prefira gerar o descritor com `pnpm api-cli generate job <module> <job>`.
+- `scheduled-queue-job-example.ts`: agendamento/reagendamento idempotente com `request.server.queue.scheduleOrRescheduleJob(...)`, `jobId` deterministico e delays por regra de negocio.
 - `queue-worker-entry-example.ts`: entrypoint local do consumidor para worker de fila com `startQueueWorker`.
 - `outbox-worker-entry-example.ts`: entrypoint local do consumidor para worker de outbox com `startOutboxWorker`.
 - `outbox-transaction-example.ts`: escrita transacional com `withOutboxTransaction`, combinando evento declarativo estavel e evento dinamico.
@@ -85,6 +86,16 @@ Trecho principal:
 const job = await request.server.queue.addJob(userCreatedJob, { userId: request.body.userId }, {
   requestId: request.requestId,
   jobOptions: { attempts: 3 },
+});
+```
+
+Para execucao unica futura e reagendavel:
+
+```ts
+const result = await request.server.queue.scheduleOrRescheduleJob(paymentJob, payload, {
+  jobId: `payment:${paymentId}:pix`,
+  delay: 5 * 60 * 1000,
+  requestId: request.requestId,
 });
 ```
 
@@ -115,6 +126,7 @@ audit(
 - Use `result-example.ts` para casos de uso que não devem lançar exceções em falhas esperadas.
 - Use `generate-client-id-example.ts` quando o consumidor precisar derivar um identificador estavel de cliente a partir do CPF.
 - Use `repo-base-example.ts`, `cache-aside-example.ts` e `queue-job-example.ts` como referência para acesso a infraestrutura.
+- Use `scheduled-queue-job-example.ts` quando a regra pedir agendar/reagendar por entidade sem criar duplicados.
 - Use `queue-worker-entry-example.ts` e `outbox-worker-entry-example.ts` ao criar os entrypoints locais gerados pelo scaffold.
 - Use `outbox-transaction-example.ts` quando o caso de uso precisar gravar domínio e registrar evento na outbox no mesmo `tx`.
 - Para eventos estaveis, prefira gerar o descritor com `pnpm api-cli generate outbox-event <module> <event>` e use `outbox-transaction-example.ts` como referencia de uso com `enqueueDefinedEvent(...)`; para eventos construidos em runtime, mantenha `enqueueEvent(...)`.
@@ -170,4 +182,5 @@ Politica de consistencia:
 - validacao fora do HTTP: `examples/parse-with-zod-example.ts`
 - geracao de `clientId` deterministico a partir de CPF: `examples/generate-client-id-example.ts`
 - fila, cache e repositorio: `examples/queue-job-example.ts`, `examples/cache-aside-example.ts`, `examples/repo-base-example.ts`
+- job agendado/reagendavel: `examples/scheduled-queue-job-example.ts`
 - workers locais e outbox transacional: `examples/queue-worker-entry-example.ts`, `examples/outbox-worker-entry-example.ts`, `examples/outbox-transaction-example.ts`
